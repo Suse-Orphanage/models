@@ -165,12 +165,11 @@ func SetPassword(user *User, password, oldPassword string) error {
 	return nil
 }
 
-func (u *User) GetAuthInfomation(signup bool) map[string]interface{} {
+func (u *User) GetAuthBaseInfomation(signup bool) map[string]interface{} {
 	return map[string]interface{}{
-		"signup": signup,
-		"openid": u.Openid,
-		"userid": u.ID,
-		// "jwt":              u.GenJwt(),
+		"signup":           signup,
+		"openid":           u.Openid,
+		"userid":           u.ID,
 		"bio":              u.Bio,
 		"username":         u.Username,
 		"avatar":           u.Avatar,
@@ -181,12 +180,11 @@ func (u *User) GetAuthInfomation(signup bool) map[string]interface{} {
 	}
 }
 
-func (u *User) GetPhoneAuthInfomation(signup bool) map[string]interface{} {
+func (u *User) GetPhoneAuthBaseInfomation(signup bool) map[string]interface{} {
 	return map[string]interface{}{
-		"signup": signup,
-		"phone":  u.Phone,
-		"userid": u.ID,
-		// "jwt":              u.GenJwt(),
+		"signup":           signup,
+		"phone":            u.Phone,
+		"userid":           u.ID,
 		"bio":              u.Bio,
 		"username":         u.Username,
 		"avatar":           u.Avatar,
