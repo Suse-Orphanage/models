@@ -47,15 +47,15 @@ func GetThreadByID(id uint) *Thread {
 	}
 }
 
-func SearchThread(keyword string, page uint) []*Thread {
-	res := make([]*Thread, 0)
+func SearchThread(keyword string, uid, page uint) []*Post {
+	res := make([]*Post, 0)
 
 	db.Where("title like ? AND level = 1", "%"+keyword+"%").Limit(10).Find(&res)
 
 	ok, _ := regexp.Match("\\d+", []byte(keyword))
 	if ok {
 		id, _ := strconv.ParseUint(keyword, 10, 32)
-		res = append(res, GetThreadByID(uint(id)))
+		res = append(res, ConstructPostObject(*GetThreadByID(uint(id)), uid))
 	}
 	return res
 }
