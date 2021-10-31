@@ -32,5 +32,6 @@ func Migrate(connStr string) error {
 		&Subscription{},
 		&Thread{},
 		&Coupon{},
+		&File{},
 	)
 }
