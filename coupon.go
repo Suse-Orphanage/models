@@ -20,7 +20,7 @@ type ICoupon interface {
 type CouponRestrictions []CouponRestriction
 
 // Scanner for CouponRestrictions
-func (j *CouponRestrictions) Scan(value interface{}) error {
+func (c *CouponRestrictions) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
 		return errors.New(fmt.Sprint("解析 CouponRestrictions 失败", value))
@@ -28,14 +28,14 @@ func (j *CouponRestrictions) Scan(value interface{}) error {
 
 	result := []CouponRestriction{}
 	err := json.Unmarshal(bytes, &result)
-	*j = result
+	*c = result
 	return err
 }
-func (j CouponRestrictions) Value() (driver.Value, error) {
-	if len(j) == 0 {
+func (c CouponRestrictions) Value() (driver.Value, error) {
+	if len(c) == 0 {
 		return nil, nil
 	}
-	return json.Marshal(j)
+	return json.Marshal(c)
 }
 
 // RestrictionType 表示优惠券限制类型，有指定商品、商品金额、指定用户等类型
@@ -67,12 +67,12 @@ const (
 
 type Coupon struct {
 	gorm.Model
-	User         User `json:"-"`
-	UserID       uint `json:"-"`
-	Type         CouponType
-	Used         bool `json:"-"`
-	Restrictions CouponRestrictions
-	DiscountData uint32 // 存放优惠券折扣相关数据
+	User         User               `json:"-"`
+	UserID       uint               `json:"-"`
+	Type         CouponType         `grom:"int"`
+	Used         bool               `json:"-"`
+	Restrictions CouponRestrictions `gorm:"varchar"`
+	DiscountData uint32             `gorm:"int"` // 存放优惠券折扣相关数据
 }
 
 func IfSatifyProductLimitRestriction(types []ProductType, p IProduct) bool {
