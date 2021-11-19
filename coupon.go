@@ -1,7 +1,10 @@
 package models
 
 import (
+	"database/sql/driver"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"math"
 
 	"gorm.io/gorm"
@@ -15,6 +18,25 @@ type ICoupon interface {
 }
 
 type CouponRestrictions []CouponRestriction
+
+// Scanner for CouponRestrictions
+func (j *CouponRestrictions) Scan(value interface{}) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New(fmt.Sprint("解析 CouponRestrictions 失败", value))
+	}
+
+	result := []CouponRestriction{}
+	err := json.Unmarshal(bytes, &result)
+	*j = result
+	return err
+}
+func (j CouponRestrictions) Value() (driver.Value, error) {
+	if len(j) == 0 {
+		return nil, nil
+	}
+	return json.Marshal(j)
+}
 
 // RestrictionType 表示优惠券限制类型，有指定商品、商品金额、指定用户等类型
 type RestrictionType uint
