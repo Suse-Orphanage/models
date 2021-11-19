@@ -177,6 +177,7 @@ func (u *User) GetAuthBaseInfomation(signup bool) map[string]interface{} {
 		"avatar":           u.Avatar,
 		"is_pro":           u.IsPro,
 		"pro_deadline":     u.ProDeadline,
+		"remaining_credit": u.RemainingCredit,
 		"followers_count":  len(u.Followers),
 		"followigns_count": len(u.Followings),
 	}
@@ -192,6 +193,7 @@ func (u *User) GetPhoneAuthBaseInfomation(signup bool) map[string]interface{} {
 		"avatar":           u.Avatar,
 		"is_pro":           u.IsPro,
 		"pro_deadline":     u.ProDeadline,
+		"remaining_credit": u.RemainingCredit,
 		"followers_count":  len(u.Followers),
 		"followigns_count": len(u.Followings),
 	}
@@ -206,6 +208,7 @@ func (u *User) GetDetailedInfomation() map[string]interface{} {
 		"bio":              u.Bio,
 		"is_pro":           u.IsPro,
 		"pro_deadline":     u.ProDeadline,
+		"remaining_credit": u.RemainingCredit,
 		"followers_count":  len(u.Followers),
 		"followings_count": len(u.Followers),
 	}
