@@ -67,10 +67,10 @@ const (
 
 type Coupon struct {
 	gorm.Model
-	User         User               `json:"-"`
 	UserID       uint               `json:"-"`
-	Type         CouponType         `grom:"int"`
-	Used         bool               `json:"-"`
+	User         User               `gorm:"foreignKey:user_id",json:"-"`
+	Type         CouponType         `gorm:"int"`
+	Used         bool               `gorm:"notNull;default:0",json:"-"`
 	Restrictions CouponRestrictions `gorm:"varchar"`
 	DiscountData uint32             `gorm:"int"` // 存放优惠券折扣相关数据
 }
