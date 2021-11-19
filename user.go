@@ -37,6 +37,8 @@ type User struct {
 	ProDeadline *time.Time `gorm:"default:NULL"`
 	Avatar      string     `gorm:"default:''"`
 
+	RemainingCredit uint `gorm:"default:0"`
+
 	// 被这些人关注
 	Followers []*User `gorm:"many2many:user_relations;foreignKey:ID;joinForeignKey:following_id;References:ID;joinReferences:user_id"`
 	// 关注了这些人
@@ -134,7 +136,7 @@ func UpdateUser(id uint, updateField map[string]interface{}) error {
 	err := db.
 		Model(&User{}).
 		Where("id = ?", id).
-		Omit("password", "salt", "openid", "phone", "unionid", "ispro", "proDeadline").
+		Omit("Password", "Salt", "Openid", "Phone", "Unionid", "IsPro", "proDeadline", "RemainingCredit").
 		Updates(updateField).
 		Error
 	if err != nil {
