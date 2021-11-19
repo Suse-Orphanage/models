@@ -68,11 +68,11 @@ const (
 type Coupon struct {
 	gorm.Model
 	UserID       uint               `json:"-"`
-	User         User               `gorm:"foreignKey:user_id",json:"-"`
-	Type         CouponType         `gorm:"int"`
-	Used         bool               `gorm:"notNull;default:0",json:"-"`
-	Restrictions CouponRestrictions `gorm:"varchar"`
-	DiscountData uint32             `gorm:"int"` // 存放优惠券折扣相关数据
+	User         User               `gorm:"foreignKey:user_id" json:"-"`
+	Type         CouponType         `gorm:"type:int"`
+	Used         bool               `gorm:"notNull;default:0" json:"-"`
+	Restrictions CouponRestrictions `gorm:"type:varchar"`
+	DiscountData uint32             `gorm:"type:int"` // 存放优惠券折扣相关数据
 }
 
 func IfSatifyProductLimitRestriction(types []ProductType, p IProduct) bool {
