@@ -71,7 +71,7 @@ type Coupon struct {
 	User         User               `gorm:"foreignKey:user_id" json:"-"`
 	Type         CouponType         `gorm:"type:int"`
 	Used         bool               `gorm:"notNull;default:0" json:"-"`
-	Restrictions CouponRestrictions `gorm:"type:varchar"`
+	Restrictions CouponRestrictions `gorm:"type:text"`
 	DiscountData uint32             `gorm:"type:int"` // 存放优惠券折扣相关数据
 }
 
