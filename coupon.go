@@ -46,6 +46,7 @@ const (
 type Coupon struct {
 	gorm.Model
 	User         User `json:"-"`
+	UserID       uint `json:"-"`
 	Type         CouponType
 	Used         bool `json:"-"`
 	Restrictions CouponRestrictions

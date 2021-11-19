@@ -258,7 +258,7 @@ func UnfollowUser(user, userToBeFollowed *User) error {
 
 	tx = db.Delete(r)
 	if tx.Error != nil {
-		logrus.WithError(tx.Error).Errorf("error on updateing at unfollow user method.")
+		logrus.WithError(tx.Error).Errorf("error on updating at unfollow user method.")
 		return errors.New("更新用户时出现错误")
 	}
 	return nil
