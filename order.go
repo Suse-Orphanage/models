@@ -38,6 +38,8 @@ type Order struct {
 	Affiliate       User      `json:"-"`
 	AffiliateID     uint      `json:"-"`
 
+	Data string `json:"-"`
+
 	Status OrderStatus `gorm:"notNull;type:int;default:0" json:"status"`
 }
 

@@ -75,7 +75,7 @@ type Coupon struct {
 	DiscountData uint32             `gorm:"type:int"` // 存放优惠券折扣相关数据
 }
 
-func IfSatifyProductLimitRestriction(types []ProductType, p IProduct) bool {
+func IfSatisfyProductLimitRestriction(types []ProductType, p IProduct) bool {
 	satisfy := false
 	for _, t := range types {
 		satisfy = satisfy || t == p.GetType()
@@ -87,27 +87,27 @@ func IfSatifyProductLimitRestriction(types []ProductType, p IProduct) bool {
 	return satisfy
 }
 
-func IfSatifyPriceThreshold(threshold, price Price) bool {
+func IfSatisfyPriceThreshold(threshold, price Price) bool {
 	return threshold.ToInt() <= price.ToInt()
 }
 
-func IfSatifySpecifiedUser(restrictedUser, user uint) bool {
+func IfSatisfySpecifiedUser(restrictedUser, user uint) bool {
 	return restrictedUser == user
 }
 
-func (coupon *Coupon) IfSatifyRestriction(product IProduct, user *User) error {
+func (coupon *Coupon) IfSatisfyRestriction(product IProduct, user *User) error {
 	for _, res := range coupon.Restrictions {
 		switch res.Type {
 		case CouponRestrictionTypeProductLimit:
-			if !IfSatifyProductLimitRestriction(res.Restriction.([]ProductType), product) {
+			if !IfSatisfyProductLimitRestriction(res.Restriction.([]ProductType), product) {
 				return errors.New("仅指定商品可用")
 			}
 		case CouponRestrictionTypePriceThreshold:
-			if !IfSatifyPriceThreshold(res.Restriction.(Price), product.GetSalePrice()) {
+			if !IfSatisfyPriceThreshold(res.Restriction.(Price), product.GetSalePrice()) {
 				return errors.New("未达到满减金额")
 			}
 		case CouponRestrictionTypeSpecifiedUser:
-			if !IfSatifySpecifiedUser(res.Restriction.(uint), user.ID) {
+			if !IfSatisfySpecifiedUser(res.Restriction.(uint), user.ID) {
 				return errors.New("仅指定用户可用")
 			}
 		}
@@ -117,7 +117,7 @@ func (coupon *Coupon) IfSatifyRestriction(product IProduct, user *User) error {
 
 // 返回折扣减去的金额
 func (coupon *Coupon) Discount(product IProduct, u *User) (Price, error) {
-	if err := coupon.IfSatifyRestriction(product, u); err != nil {
+	if err := coupon.IfSatisfyRestriction(product, u); err != nil {
 		return 0, err
 	}
 
