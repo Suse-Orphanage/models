@@ -31,3 +31,15 @@ func CreateOrder(o Order) error {
 	tx := db.Create(o)
 	return tx.Error
 }
+
+func GetOrderByID(id string) (Order, error) {
+	var o Order
+	tx := db.Where("timestampped_id = ?", id).First(&o)
+	return o, tx.Error
+}
+
+func MarkOrderPaid(id string) error {
+	var o Order
+	tx := db.Model(&o).Where("timestampped_id = ?", id).Update("paid", true)
+	return tx.Error
+}

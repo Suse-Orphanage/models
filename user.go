@@ -263,3 +263,23 @@ func UnfollowUser(user, userToBeFollowed *User) error {
 	}
 	return nil
 }
+
+func (u *User) IncreaseCreditBy(cnt uint) error {
+	u.RemainingCredit += cnt
+	tx := db.Save(u)
+	if tx.Error != nil {
+		logrus.WithError(tx.Error).Errorf("error on updating at increase credit method.")
+		return errors.New("更新用户时出现错误")
+	}
+	return nil
+}
+
+func (u *User) DecreaseCreditBy(cnt uint) error {
+	u.RemainingCredit -= cnt
+	tx := db.Save(u)
+	if tx.Error != nil {
+		logrus.WithError(tx.Error).Errorf("error on updating at decrease credit method.")
+		return errors.New("更新用户时出现错误")
+	}
+	return nil
+}
