@@ -47,8 +47,7 @@ func GetOrderByID(id string) (Order, error) {
 	return o, tx.Error
 }
 
-func MarkOrderPaid(id string) error {
-	var o Order
-	tx := db.Model(&o).Where("timestampped_id = ?", id).Update("status", OrderStatusPaid)
+func (o *Order) MarkPaid() error {
+	tx := db.Model(o).Update("status", OrderStatusPaid)
 	return tx.Error
 }
