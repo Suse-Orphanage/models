@@ -149,11 +149,7 @@ func GetCouponById(id uint) (*Coupon, error) {
 	return &coupon, nil
 }
 
-func MarkCouponUsed(id uint) error {
-	coupon := Coupon{}
-	tx := db.Model(&coupon).Where("id = ?", id).Update("used", true)
-	if tx.Error != nil {
-		return tx.Error
-	}
-	return nil
+func (c *Coupon) MarkUsed() error {
+	c.Used = true
+	return db.Save(c).Error
 }
