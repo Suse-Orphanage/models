@@ -15,6 +15,13 @@ const (
 	OrderTypeBilling
 )
 
+type OrderStatus uint
+
+const (
+	OrderStatusPending = iota
+	OrderStatusPaid
+)
+
 type Order struct {
 	gorm.Model
 	TimestamppedID  string    `gorm:"index" json:"oid"`
@@ -25,6 +32,8 @@ type Order struct {
 	Coupon          Coupon    `json:"-"`
 	Affiliate       User      `json:"-"`
 	AffiliateID     uint      `json:"-"`
+
+	Status OrderStatus `gorm:"notNull;type:int;default:0" json:"status"`
 }
 
 func CreateOrder(o Order) error {
@@ -40,6 +49,6 @@ func GetOrderByID(id string) (Order, error) {
 
 func MarkOrderPaid(id string) error {
 	var o Order
-	tx := db.Model(&o).Where("timestampped_id = ?", id).Update("paid", true)
+	tx := db.Model(&o).Where("timestampped_id = ?", id).Update("status", OrderStatusPaid)
 	return tx.Error
 }
