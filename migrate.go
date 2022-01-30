@@ -33,5 +33,6 @@ func Migrate(connStr string) error {
 		&Thread{},
 		&Coupon{},
 		&File{},
+		&DynamicConfiguration{},
 	)
 }
