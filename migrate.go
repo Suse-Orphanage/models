@@ -22,18 +22,34 @@ func Migrate(connStr string) error {
 		return err
 	}
 
-	return db.AutoMigrate(
+	err = db.AutoMigrate(
 		&User{},
 		&ValidationCodeSms{},
 		&Store{},
 		&StoreStar{},
 		&Seat{},
 		&SeatStatus{},
-		&SubscriptionPlan{},
-		&Subscription{},
+		// &SubscriptionPlan{},
+		// &Subscription{},
+		&Good{},
 		&Thread{},
 		&Coupon{},
 		&File{},
 		&DynamicConfiguration{},
 	)
+
+	if err != nil {
+		return err
+	}
+
+	for _, good := range *GetBuiltinGoods() {
+		if db.Find(&Good{}, good.ID).RowsAffected != 0 {
+			tx := db.Create(good)
+			if tx.Error != nil {
+				return tx.Error
+			}
+		}
+	}
+
+	return nil
 }

@@ -33,7 +33,9 @@ type Order struct {
 	Date            time.Time `json:"date"`
 	Price           Price     `json:"price"`
 	DiscountedPrice Price     `json:"discounted_price"`
+	Amount          uint      `json:"amount"`
 	Type            OrderType `json:"type"`
+	Good            string    `json:"good"`
 	Coupon          Coupon    `json:"-"`
 	Affiliate       User      `json:"-"`
 	AffiliateID     uint      `json:"-"`
