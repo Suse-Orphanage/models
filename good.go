@@ -67,3 +67,27 @@ func GetMonthlySubscriptionGoodID() uint {
 func GetSeasonSubscriptionGoodID() uint {
 	return 3
 }
+
+func GetGoodByID(id uint) (*Good, error) {
+	var good Good
+	tx := db.First(&good, "id = ?", id)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return &good, nil
+}
+
+func GetCreditGood() *Good {
+	good, _ := GetGoodByID(GetCreditGoodID())
+	return good
+}
+
+func GetMonthlySubscriptionGood() *Good {
+	good, _ := GetGoodByID(GetMonthlySubscriptionGoodID())
+	return good
+}
+
+func GetSeasonSubscriptionGood() *Good {
+	good, _ := GetGoodByID(GetSeasonSubscriptionGoodID())
+	return good
+}

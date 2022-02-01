@@ -35,7 +35,7 @@ type Order struct {
 	DiscountedPrice Price     `json:"discounted_price"`
 	Amount          uint      `json:"amount"`
 	Type            OrderType `json:"type"`
-	Good            string    `json:"good"`
+	Good            Good      `json:"good"`
 	Coupon          Coupon    `json:"-"`
 	Affiliate       User      `json:"-"`
 	AffiliateID     uint      `json:"-"`
