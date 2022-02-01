@@ -55,3 +55,15 @@ func GetBuiltinGoods() *[]Good {
 		},
 	}
 }
+
+func GetCreditGoodID() uint {
+	return 1
+}
+
+func GetMonthlySubscriptionGoodID() uint {
+	return 2
+}
+
+func GetSeasonSubscriptionGoodID() uint {
+	return 3
+}

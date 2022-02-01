@@ -29,8 +29,6 @@ func Migrate(connStr string) error {
 		&StoreStar{},
 		&Seat{},
 		&SeatStatus{},
-		// &SubscriptionPlan{},
-		// &Subscription{},
 		&Good{},
 		&Thread{},
 		&Coupon{},
