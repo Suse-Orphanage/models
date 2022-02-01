@@ -37,7 +37,7 @@ type User struct {
 	ProDeadline *time.Time `gorm:"default:NULL"`
 	Avatar      string     `gorm:"default:''"`
 
-	RemainingCredit uint `gorm:"default:0"`
+	RemainingCredit Price `gorm:"default:0"`
 
 	// 被这些人关注
 	Followers []*User `gorm:"many2many:user_relations;foreignKey:ID;joinForeignKey:following_id;References:ID;joinReferences:user_id"`
@@ -264,8 +264,8 @@ func UnfollowUser(user, userToBeFollowed *User) error {
 	return nil
 }
 
-func (u *User) IncreaseCreditBy(cnt uint) error {
-	u.RemainingCredit += cnt
+func (u *User) IncreaseCreditBy(cnt float64) error {
+	u.RemainingCredit += Price(uint64(u.RemainingCredit) + uint64(cnt*100))
 	tx := db.Save(u)
 	if tx.Error != nil {
 		logrus.WithError(tx.Error).Errorf("error on updating at increase credit method.")
@@ -274,12 +274,16 @@ func (u *User) IncreaseCreditBy(cnt uint) error {
 	return nil
 }
 
-func (u *User) DecreaseCreditBy(cnt uint) error {
-	u.RemainingCredit -= cnt
+func (u *User) DecreaseCreditBy(cnt float64) error {
+	u.RemainingCredit = Price(uint64(u.RemainingCredit) - uint64(cnt*100))
 	tx := db.Save(u)
 	if tx.Error != nil {
 		logrus.WithError(tx.Error).Errorf("error on updating at decrease credit method.")
 		return errors.New("更新用户时出现错误")
 	}
 	return nil
+}
+
+func (u *User) CreditLessThan(v float64) bool {
+	return u.RemainingCredit.ToFloat64() < v
 }
