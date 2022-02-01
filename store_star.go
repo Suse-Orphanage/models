@@ -32,10 +32,10 @@ func UnstarStore(s Store, u *User) bool {
 }
 
 func GetStaredStores(u *User, page int) []Store {
-	list := make([]StoreStar, 10)
+	var list []StoreStar
 	db.Where("user_id = ?", u.ID).Limit(10).Offset((page - 1) * 10).Find(&list)
 
-	stores := make([]Store, 10)
+	var stores []Store
 	for _, ss := range list {
 		stores = append(stores, ss.Store)
 	}
