@@ -275,7 +275,11 @@ func (u *User) IncreaseCreditBy(cnt float64) error {
 }
 
 func (u *User) DecreaseCreditBy(cnt float64) error {
-	u.RemainingCredit = Price(uint64(u.RemainingCredit) - uint64(cnt*100))
+	remainingCredit := int64(u.RemainingCredit) - int64(cnt*100)
+	if remainingCredit < 0 {
+		remainingCredit = 0
+	}
+	u.RemainingCredit = Price(remainingCredit)
 	tx := db.Save(u)
 	if tx.Error != nil {
 		logrus.WithError(tx.Error).Errorf("error on updating at decrease credit method.")
