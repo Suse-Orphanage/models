@@ -69,7 +69,7 @@ func GetStore() *Store {
 
 func GetStoreByID(id uint) *Store {
 	store := &Store{}
-	tx := db.Find(store, "id = ?", id)
+	tx := db.First(store, "id = ?", id)
 	if tx.Error != nil {
 		return nil
 	}
