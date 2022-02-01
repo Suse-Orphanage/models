@@ -26,6 +26,7 @@ func Migrate(connStr string) error {
 		&User{},
 		&ValidationCodeSms{},
 		&Store{},
+		&StoreStar{},
 		&Seat{},
 		&SeatStatus{},
 		&SubscriptionPlan{},
