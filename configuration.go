@@ -8,7 +8,7 @@ import (
 
 type DynamicConfiguration struct {
 	gorm.Model
-	Name         string `gorm:"uniqueIndex;type:var(128)"`
+	Name         string `gorm:"uniqueIndex;type:varchar(128)"`
 	Value        string
 	LastModified time.Time
 }
