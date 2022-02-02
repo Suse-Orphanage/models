@@ -37,8 +37,8 @@ type Order struct {
 	Type            OrderType `json:"type"`
 	GoodID          uint      `json:"-"`
 	Good            Good      `json:"good"`
-	CouponID        uint      `json:"-"`
-	Coupon          Coupon    `json:"-"`
+	CouponID        *uint     `json:"-"`
+	Coupon          *Coupon   `json:"-"`
 	Affiliate       User      `json:"-"`
 	AffiliateID     uint      `json:"-"`
 
