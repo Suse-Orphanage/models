@@ -22,6 +22,45 @@ const (
 	UserTypeWx
 )
 
+type UserStatus uint
+
+const (
+	UserStatusNormal UserStatus = iota
+	UserStatusBanned
+	UserStatusDeleted
+)
+
+func (us *UserStatus) MarshalJSON() ([]byte, error) {
+	var status string
+	switch *us {
+	case UserStatusNormal:
+		status = "normal"
+	case UserStatusBanned:
+		status = "banned"
+	case UserStatusDeleted:
+		status = "deleted"
+	}
+	return []byte(`"` + status + `"`), nil
+}
+
+type UserBillingStatus uint
+
+const (
+	UserBillingStatusNone UserBillingStatus = iota
+	UserBillingStatusOnBilling
+)
+
+func (us *UserBillingStatus) MarshalJSON() ([]byte, error) {
+	var status string
+	switch *us {
+	case UserBillingStatusOnBilling:
+		status = "billing"
+	case UserBillingStatusNone:
+		status = "none"
+	}
+	return []byte(`"` + status + `"`), nil
+}
+
 type User struct {
 	gorm.Model
 	Type        UserType   `gorm:"type:tinyint;notNull"`
@@ -36,6 +75,10 @@ type User struct {
 	IsPro       bool       `gorm:"notNull;default:0"`
 	ProDeadline *time.Time `gorm:"default:NULL"`
 	Avatar      string     `gorm:"default:''"`
+
+	Status              UserStatus        `gorm:"default:0"`
+	BillingStatus       UserBillingStatus `gorm:"default:0"`
+	RecentBillStartTime *time.Time        `gorm:"default:NULL"`
 
 	RemainingCredit Price `gorm:"default:0"`
 
@@ -197,6 +240,8 @@ func (u *User) GetAuthBaseInfomation(signup bool) map[string]interface{} {
 		"followers_count":  len(u.Followers),
 		"followigns_count": len(u.Followings),
 		"password_set":     u.Password != "",
+		"status":           u.Status,
+		"billing_status":   u.BillingStatus,
 	}
 }
 
@@ -214,6 +259,8 @@ func (u *User) GetPhoneAuthBaseInfomation(signup bool) map[string]interface{} {
 		"followers_count":  len(u.Followers),
 		"followigns_count": len(u.Followings),
 		"password_set":     u.Password != "",
+		"status":           u.Status,
+		"billing_status":   u.BillingStatus,
 	}
 }
 
@@ -229,6 +276,8 @@ func (u *User) GetDetailedInfomation() map[string]interface{} {
 		"remaining_credit": u.RemainingCredit.ToFloat64(),
 		"followers_count":  len(u.Followers),
 		"followings_count": len(u.Followers),
+		"status":           u.Status,
+		"billing_status":   u.BillingStatus,
 	}
 }
 
@@ -308,4 +357,19 @@ func (u *User) DecreaseCreditBy(cnt float64) error {
 
 func (u *User) CreditLessThan(v float64) bool {
 	return u.RemainingCredit.ToFloat64() < v
+}
+
+func (u *User) SetStatus(s UserStatus) error {
+	u.Status = s
+	return db.Save(u).Error
+}
+
+func (u *User) SetBillingStatus(s UserBillingStatus) error {
+	u.BillingStatus = s
+	return db.Save(u).Error
+}
+
+func (u *User) SetRecentBillTime(t *time.Time) error {
+	u.RecentBillStartTime = t
+	return db.Save(u).Error
 }
