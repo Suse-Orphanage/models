@@ -167,6 +167,22 @@ func SetPassword(user *User, password, oldPassword string) error {
 	return nil
 }
 
+func (u *User) SetAvatar(avatar string) error {
+	tx := db.Model(u).Updates(map[string]interface{}{
+		"avatar": avatar,
+	})
+
+	if tx.Error != nil {
+		return errors.New("更新头像时出现错误")
+	}
+
+	return nil
+}
+
+func (u *User) CheckPassword(password string) bool {
+	return encryptPassword(password, u.Salt) == u.Password
+}
+
 func (u *User) GetAuthBaseInfomation(signup bool) map[string]interface{} {
 	return map[string]interface{}{
 		"signup":           signup,
@@ -180,6 +196,7 @@ func (u *User) GetAuthBaseInfomation(signup bool) map[string]interface{} {
 		"remaining_credit": u.RemainingCredit,
 		"followers_count":  len(u.Followers),
 		"followigns_count": len(u.Followings),
+		"password_set":     u.Password != "",
 	}
 }
 
@@ -196,6 +213,7 @@ func (u *User) GetPhoneAuthBaseInfomation(signup bool) map[string]interface{} {
 		"remaining_credit": u.RemainingCredit,
 		"followers_count":  len(u.Followers),
 		"followigns_count": len(u.Followings),
+		"password_set":     u.Password != "",
 	}
 }
 
