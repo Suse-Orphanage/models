@@ -47,7 +47,7 @@ func GetBuiltinGoods() *[]Good {
 			Description: "一个月的会员",
 		},
 		{
-			Model:       gorm.Model{ID: 2},
+			Model:       gorm.Model{ID: 3},
 			Name:        "季卡",
 			Price:       ToPrice(69),
 			Type:        GoodTypeSubscription,
