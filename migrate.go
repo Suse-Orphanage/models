@@ -41,7 +41,7 @@ func Migrate(connStr string) error {
 	}
 
 	for _, good := range *GetBuiltinGoods() {
-		if db.Find(&Good{}, good.ID).RowsAffected != 0 {
+		if db.Find(&Good{}, good.ID).RowsAffected == 0 {
 			tx := db.Create(good)
 			if tx.Error != nil {
 				return tx.Error
