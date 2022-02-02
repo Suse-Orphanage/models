@@ -15,8 +15,8 @@ type DynamicConfiguration struct {
 
 func GetConfigurationValue(name string) interface{} {
 	config := DynamicConfiguration{}
-	err := db.Find(&config, "name = ?", name)
-	if err != nil {
+	tx := db.First(&config, "name = ?", name)
+	if tx.Error != nil {
 		return nil
 	}
 	return config.Value
