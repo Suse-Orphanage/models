@@ -40,9 +40,10 @@ func Migrate(connStr string) error {
 		return err
 	}
 
-	for _, good := range *GetBuiltinGoods() {
+	goodsList := *GetBuiltinGoods()
+	for idx, good := range goodsList {
 		if db.Find(&Good{}, good.ID).RowsAffected == 0 {
-			tx := db.Create(good)
+			tx := db.Create(&goodsList[idx])
 			if tx.Error != nil {
 				return tx.Error
 			}
