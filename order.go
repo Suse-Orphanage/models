@@ -47,7 +47,7 @@ type Order struct {
 	Status OrderStatus `gorm:"notNull;type:int;default:0" json:"status"`
 }
 
-func CreateOrder(o Order) error {
+func CreateOrder(o *Order) error {
 	tx := db.Create(o)
 	return tx.Error
 }

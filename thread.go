@@ -181,7 +181,7 @@ func NewPost(title, content string, author uint) (*Thread, error) {
 		Level:    ThreadLevelPost,
 	}
 
-	tx := db.Create(thread)
+	tx := db.Create(&thread)
 	if tx.Error != nil {
 		return &thread, nil
 	}
@@ -198,7 +198,7 @@ func ReplyToThread(thread uint, author uint, content string) error {
 		Level:    ThreadLevelComment,
 	}
 
-	tx := db.Create(commentThread)
+	tx := db.Create(&commentThread)
 	return tx.Error
 }
 
@@ -210,7 +210,7 @@ func ReplyToComment(thread uint, author uint, replyTo uint, content string) erro
 		Level:    ThreadLevelReply,
 	}
 
-	tx := db.Create(replyThread)
+	tx := db.Create(&replyThread)
 	return tx.Error
 }
 
