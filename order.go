@@ -54,7 +54,7 @@ func CreateOrder(o *Order) error {
 
 func GetOrderByID(id string) (Order, error) {
 	var o Order
-	tx := db.Where("timestampped_id = ?", id).First(&o)
+	tx := db.Set("gorm:auto_preload", true).Where("timestampped_id = ?", id).First(&o)
 	return o, tx.Error
 }
 
