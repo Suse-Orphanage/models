@@ -320,8 +320,8 @@ func (u *User) GetPublicInfomation() map[string]interface{} {
 		"username":         u.Username,
 		"bio":              u.Bio,
 		"is_pro":           u.IsPro,
-		"followers_count":  len(u.Followers),
-		"followings_count": len(u.Followers),
+		"followers_count":  u.GetFollowersCount(),
+		"followigns_count": u.GetFollowingsCount(),
 		"status":           u.Status,
 	}
 }
