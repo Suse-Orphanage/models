@@ -272,12 +272,12 @@ func (u *User) GetDetailedInfomation() map[string]interface{} {
 		"username":         u.Username,
 		"bio":              u.Bio,
 		"is_pro":           u.IsPro,
-		"pro_deadline":     u.ProDeadline,
-		"remaining_credit": u.RemainingCredit.ToFloat64(),
 		"followers_count":  len(u.Followers),
 		"followings_count": len(u.Followers),
 		"status":           u.Status,
-		"billing_status":   u.BillingStatus,
+		// "pro_deadline":     u.ProDeadline,
+		// "remaining_credit": u.RemainingCredit.ToFloat64(),
+		// "billing_status":   u.BillingStatus,
 	}
 }
 
