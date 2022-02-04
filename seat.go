@@ -19,6 +19,7 @@ type Seat struct {
 	Label   string
 	StoreID uint
 	Status  []SeatStatus
+	Devices []Device
 }
 
 type SeatStatus struct {

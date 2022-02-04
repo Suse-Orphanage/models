@@ -36,6 +36,8 @@ func Migrate(connStr string) error {
 		&Coupon{},
 		&File{},
 		&DynamicConfiguration{},
+		&Device{},
+		&DeviceToken{},
 	)
 
 	if err != nil {
