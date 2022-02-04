@@ -226,6 +226,24 @@ func (u *User) CheckPassword(password string) bool {
 	return encryptPassword(password, u.Salt) == u.Password
 }
 
+func (u *User) GetFollowersCount() int64 {
+	var count int64 = 0
+	db.
+		Table("user_relations").
+		Where("following_id = ?", u.ID).
+		Count(&count)
+	return count
+}
+
+func (u *User) GetFollowingsCount() int64 {
+	var count int64 = 0
+	db.
+		Table("user_relations").
+		Where("user_id = ?", u.ID).
+		Count(&count)
+	return count
+}
+
 func (u *User) GetAuthBaseInfomation(signup bool) map[string]interface{} {
 	return map[string]interface{}{
 		"signup":           signup,
@@ -237,8 +255,8 @@ func (u *User) GetAuthBaseInfomation(signup bool) map[string]interface{} {
 		"is_pro":           u.IsPro,
 		"pro_deadline":     u.ProDeadline,
 		"remaining_credit": u.RemainingCredit.ToFloat64(),
-		"followers_count":  len(u.Followers),
-		"followigns_count": len(u.Followings),
+		"followers_count":  u.GetFollowersCount(),
+		"followigns_count": u.GetFollowingsCount(),
 		"password_set":     u.Password != "",
 		"status":           u.Status,
 		"billing_status":   u.BillingStatus,
@@ -256,15 +274,27 @@ func (u *User) GetPhoneAuthBaseInfomation(signup bool) map[string]interface{} {
 		"is_pro":           u.IsPro,
 		"pro_deadline":     u.ProDeadline,
 		"remaining_credit": u.RemainingCredit.ToFloat64(),
-		"followers_count":  len(u.Followers),
-		"followigns_count": len(u.Followings),
+		"followers_count":  u.GetFollowersCount(),
+		"followigns_count": u.GetFollowingsCount(),
 		"password_set":     u.Password != "",
 		"status":           u.Status,
 		"billing_status":   u.BillingStatus,
 	}
 }
 
-func (u *User) GetDetailedInfomation() map[string]interface{} {
+func (u *User) GetDetailedInfomation(whoInquery *User) map[string]interface{} {
+	var tmp int64 = 0
+	db.
+		Table("user_relations").
+		Where("user_id = ? and following_id = ?", whoInquery.ID, u.ID).
+		Count(&tmp)
+	isFollowing := tmp == 1
+	db.
+		Table("user_relations").
+		Where("user_id = ? and following_id = ?", u.ID, whoInquery.ID).
+		Count(&tmp)
+	isFollower := tmp == 1
+
 	return map[string]interface{}{
 		"userid":           u.ID,
 		"phone":            u.Phone,
@@ -272,9 +302,11 @@ func (u *User) GetDetailedInfomation() map[string]interface{} {
 		"username":         u.Username,
 		"bio":              u.Bio,
 		"is_pro":           u.IsPro,
-		"followers_count":  len(u.Followers),
-		"followings_count": len(u.Followers),
+		"followers_count":  u.GetFollowersCount(),
+		"followigns_count": u.GetFollowingsCount(),
 		"status":           u.Status,
+		"is_following":     isFollowing,
+		"is_follower":      isFollower,
 		// "pro_deadline":     u.ProDeadline,
 		// "remaining_credit": u.RemainingCredit.ToFloat64(),
 		// "billing_status":   u.BillingStatus,
@@ -290,6 +322,7 @@ func (u *User) GetPublicInfomation() map[string]interface{} {
 		"is_pro":           u.IsPro,
 		"followers_count":  len(u.Followers),
 		"followings_count": len(u.Followers),
+		"status":           u.Status,
 	}
 }
 
