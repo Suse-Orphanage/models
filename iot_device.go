@@ -10,6 +10,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -42,7 +43,8 @@ type Device struct {
 	Status       DeviceStatus `gorm:"type:tinyint;default:0"`
 	Seat         Seat
 	SeatID       uint
-	CurrentToken string `gorm:"type:varchar(128)"`
+	ConnectionID string `gorm:"type:varchar(128);uniqueIndex"`
+	CurrentToken string `gorm:"type:varchar(1024)"`
 }
 
 type DeviceToken struct {
@@ -117,6 +119,12 @@ func (t *DeviceToken) IsExpired() bool {
 
 func (d *Device) SetDeviceStatus(status DeviceStatus) error {
 	d.Status = status
+	tx := db.Save(d)
+	return tx.Error
+}
+
+func (d *Device) SetConnectionID() error {
+	d.ConnectionID = uuid.New().String()
 	tx := db.Save(d)
 	return tx.Error
 }
