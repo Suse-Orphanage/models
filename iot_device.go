@@ -10,7 +10,6 @@ import (
 	"io"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -123,8 +122,8 @@ func (d *Device) SetDeviceStatus(status DeviceStatus) error {
 	return tx.Error
 }
 
-func (d *Device) SetConnectionID() error {
-	d.ConnectionID = uuid.New().String()
+func (d *Device) SetConnectionID(id string) error {
+	d.ConnectionID = id
 	tx := db.Save(d)
 	return tx.Error
 }
