@@ -76,6 +76,9 @@ type User struct {
 	ProDeadline *time.Time `gorm:"default:NULL"`
 	Avatar      string     `gorm:"default:''"`
 
+	CurrentOccupiedSeat   Seat
+	CurrentOccupiedSeatID uint
+
 	Status              UserStatus        `gorm:"default:0"`
 	BillingStatus       UserBillingStatus `gorm:"default:0"`
 	RecentBillStartTime *time.Time        `gorm:"default:NULL"`
@@ -404,5 +407,20 @@ func (u *User) SetBillingStatus(s UserBillingStatus) error {
 
 func (u *User) SetRecentBillTime(t *time.Time) error {
 	u.RecentBillStartTime = t
+	return db.Save(u).Error
+}
+
+func (u *User) SetProDeadline(t *time.Time) error {
+	u.ProDeadline = t
+	return db.Save(u).Error
+}
+
+func (u *User) SetCurrentOccupiedSeat(seat *Seat) error {
+	if seat == nil {
+		u.CurrentOccupiedSeatID = 0
+	} else {
+		u.CurrentOccupiedSeatID = seat.ID
+	}
+
 	return db.Save(u).Error
 }

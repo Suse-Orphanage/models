@@ -50,12 +50,14 @@ type DeviceToken struct {
 	gorm.Model
 	Affiliate   Device
 	AffiliateID uint
+	User        User
+	UserID      uint `gorm:"not null"`
 	Token       string
 	Valid       bool      `gorm:"defualt:true"`
 	Deadline    time.Time `gorm:"not null"`
 }
 
-func (d *Device) CreateToken(key []byte, expiration uint) string {
+func (d *Device) CreateToken(key []byte, expiration uint, u *User) string {
 	id := d.DeviceID
 	exp := time.Now().Add(time.Duration(expiration) * time.Minute)
 
@@ -88,7 +90,7 @@ func (d *Device) CreateToken(key []byte, expiration uint) string {
 
 	token := base64.URLEncoding.EncodeToString(ciphertext)
 
-	err = SaveToken(d, token, exp)
+	err = SaveToken(d, token, exp, u)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to save device token into database")
 		return ""
@@ -96,12 +98,13 @@ func (d *Device) CreateToken(key []byte, expiration uint) string {
 	return token
 }
 
-func SaveToken(device *Device, token string, expiration time.Time) error {
+func SaveToken(device *Device, token string, expiration time.Time, u *User) error {
 	tx := db.Create(&DeviceToken{
 		AffiliateID: device.ID,
 		Token:       token,
 		Valid:       true,
 		Deadline:    expiration,
+		UserID:      u.ID,
 	})
 	return tx.Error
 }
