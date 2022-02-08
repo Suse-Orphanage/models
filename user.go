@@ -424,3 +424,17 @@ func (u *User) SetCurrentOccupiedSeat(seat *Seat) error {
 
 	return db.Save(u).Error
 }
+
+func (u *User) GetCurrentOccupiedDevices() []Device {
+	ret := make([]Device, 0)
+	if u.CurrentOccupiedSeatID == 0 {
+		return ret
+	}
+
+	tx := db.Find(&ret, "seat_id = ?", u.CurrentOccupiedSeatID)
+	if tx.Error != nil {
+		return []Device{}
+	}
+
+	return ret
+}
