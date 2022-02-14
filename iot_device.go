@@ -52,12 +52,14 @@ type DeviceToken struct {
 	AffiliateID uint
 	User        User
 	UserID      uint `gorm:"not null"`
+	Session     Session
+	SessionID   uint `gorm:"not null"`
 	Token       string
 	Valid       bool      `gorm:"defualt:true"`
 	Deadline    time.Time `gorm:"not null"`
 }
 
-func (d *Device) CreateToken(key []byte, expiration uint, u *User) string {
+func (d *Device) CreateToken(key []byte, expiration uint, u *User, s *Session) string {
 	id := d.DeviceID
 	exp := time.Now().Add(time.Duration(expiration) * time.Minute)
 
@@ -69,6 +71,7 @@ func (d *Device) CreateToken(key []byte, expiration uint, u *User) string {
 	binary.LittleEndian.PutUint64(nanosecond, uint64(exp.Nanosecond()))
 
 	hasher.Write([]byte(id))
+	hasher.Write([]byte(s.Token))
 	hasher.Write(timestamp)
 	hasher.Write(nanosecond)
 
@@ -90,7 +93,7 @@ func (d *Device) CreateToken(key []byte, expiration uint, u *User) string {
 
 	token := base64.URLEncoding.EncodeToString(ciphertext)
 
-	err = SaveToken(d, token, exp, u)
+	err = SaveToken(d, token, exp, u, s)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to save device token into database")
 		return ""
@@ -98,13 +101,14 @@ func (d *Device) CreateToken(key []byte, expiration uint, u *User) string {
 	return token
 }
 
-func SaveToken(device *Device, token string, expiration time.Time, u *User) error {
+func SaveToken(device *Device, token string, expiration time.Time, u *User, s *Session) error {
 	tx := db.Create(&DeviceToken{
 		AffiliateID: device.ID,
 		Token:       token,
 		Valid:       true,
 		Deadline:    expiration,
 		UserID:      u.ID,
+		SessionID:   s.ID,
 	})
 	return tx.Error
 }

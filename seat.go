@@ -16,10 +16,11 @@ const (
 
 type Seat struct {
 	gorm.Model
-	Label   string
-	StoreID uint
-	Status  []SeatStatus
-	Devices []Device
+	Label         string
+	StoreID       uint
+	CurrentStatus SeatStatusEnum
+	Status        []SeatStatus
+	Devices       []Device
 }
 
 type SeatStatus struct {
@@ -81,4 +82,19 @@ func (s *Seat) CombineStatus(day time.Time) (*CombinedSeatStatus, error) {
 	}
 
 	return ret, nil
+}
+
+func GetSeatByID(id uint) *Seat {
+	seat := &Seat{}
+	tx := db.First(seat, "id = ?", id)
+	if tx.Error != nil {
+		return nil
+	}
+	return seat
+}
+
+func (s *Seat) SetStatus(status SeatStatusEnum) error {
+	s.CurrentStatus = status
+	tx := db.Save(s)
+	return tx.Error
 }
