@@ -22,7 +22,7 @@ type Session struct {
 	Seat   Seat
 	SeatID uint
 
-	Token string
+	Token string `gorm:"uniqueIndex"`
 }
 
 func CreateSession(key []byte, u *User, s *Seat) string {
@@ -81,4 +81,13 @@ func SaveSession(token string, u *User, s *Seat) error {
 		Token:  token,
 	})
 	return tx.Error
+}
+
+func GetSession(session string) *Session {
+	var s Session
+	tx := db.Preload("User").Preload("Seat").Where("token = ?", session).First(&s)
+	if tx.Error != nil {
+		return nil
+	}
+	return &s
 }

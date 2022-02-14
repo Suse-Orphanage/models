@@ -84,6 +84,15 @@ func (s *Seat) CombineStatus(day time.Time) (*CombinedSeatStatus, error) {
 	return ret, nil
 }
 
+func GetSeatByIDWithDevices(id uint) *Seat {
+	seat := &Seat{}
+	tx := db.Preload("Devices").First(seat, "id = ?", id)
+	if tx.Error != nil {
+		return nil
+	}
+	return seat
+}
+
 func GetSeatByID(id uint) *Seat {
 	seat := &Seat{}
 	tx := db.First(seat, "id = ?", id)
