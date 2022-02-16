@@ -112,11 +112,11 @@ func (s *Session) SetValidate(v bool) error {
 
 func ValidateSession(start, end *time.Time) bool {
 	var cnt int64 = 0
-	tx := db.Model(&Session{}).Where("start_time >= ?", start)
-	if end != nil {
-		tx.Where("end_time <= ?", end)
+	if end == nil {
+		t := start.Add(time.Hour + time.Minute*10)
+		end = &t
 	}
-	tx.Count(&cnt)
+	tx := db.Model(&Session{}).Where("start_time >= ?", start).Where("end_time <= ?", end).Count(&cnt)
 
 	if tx.Error != nil {
 		logrus.WithError(tx.Error).Error("Failed to validate session time")
