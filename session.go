@@ -30,7 +30,7 @@ type Session struct {
 	Token string `gorm:"uniqueIndex"`
 }
 
-func CreateSession(key []byte, u *User, s *Seat) string {
+func CreateSession(key []byte, u *User, s *Seat, startTime *time.Time) string {
 	uid := u.ID
 	uidBytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(uidBytes, uint64(uid))
@@ -69,7 +69,7 @@ func CreateSession(key []byte, u *User, s *Seat) string {
 
 	token := base64.URLEncoding.EncodeToString(ciphertext)
 
-	err = SaveSession(token, u, s)
+	err = SaveSession(token, u, s, startTime)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to save session into database")
 		return ""
@@ -77,13 +77,14 @@ func CreateSession(key []byte, u *User, s *Seat) string {
 	return token
 }
 
-func SaveSession(token string, u *User, s *Seat) error {
+func SaveSession(token string, u *User, s *Seat, startTime *time.Time) error {
 	tx := db.Create(&Session{
-		User:   *u,
-		UserID: u.ID,
-		Seat:   *s,
-		SeatID: s.ID,
-		Token:  token,
+		User:      *u,
+		UserID:    u.ID,
+		Seat:      *s,
+		SeatID:    s.ID,
+		Token:     token,
+		StartTime: startTime,
 	})
 	return tx.Error
 }
