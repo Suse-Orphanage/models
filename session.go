@@ -22,6 +22,11 @@ type Session struct {
 	Seat   Seat
 	SeatID uint
 
+	StartTime *time.Time `gorm:"not null"`
+	EndTime   *time.Time
+
+	Validate *bool `gorm:"default:true"`
+
 	Token string `gorm:"uniqueIndex"`
 }
 
@@ -90,4 +95,16 @@ func GetSession(session string) *Session {
 		return nil
 	}
 	return &s
+}
+
+func (s *Session) SetEndTime(t *time.Time) error {
+	s.EndTime = t
+	tx := db.Save(s)
+	return tx.Error
+}
+
+func (s *Session) SetValidate(v bool) error {
+	s.Validate = &v
+	tx := db.Save(s)
+	return tx.Error
 }

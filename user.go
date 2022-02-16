@@ -72,7 +72,7 @@ type User struct {
 	Openid      string     `gorm:"type:char(32);index"`
 	Unionid     string     `gorm:"type:char(64);index"`
 	Session     string     `gorm:"type:varchar(64)"`
-	IsPro       bool       `gorm:"notNull;default:0"`
+	IsPro       bool       `gorm:"notNull;default:false"`
 	ProDeadline *time.Time `gorm:"default:NULL"`
 	Avatar      string     `gorm:"default:''"`
 

@@ -55,7 +55,7 @@ type DeviceToken struct {
 	Session     Session
 	SessionID   uint `gorm:"not null"`
 	Token       string
-	Valid       bool      `gorm:"defualt:true"`
+	Valid       *bool     `gorm:"defualt:true"`
 	Deadline    time.Time `gorm:"not null"`
 }
 
@@ -105,7 +105,6 @@ func SaveToken(device *Device, token string, expiration time.Time, u *User, s *S
 	tx := db.Create(&DeviceToken{
 		AffiliateID: device.ID,
 		Token:       token,
-		Valid:       true,
 		Deadline:    expiration,
 		UserID:      u.ID,
 		SessionID:   s.ID,
@@ -114,13 +113,13 @@ func SaveToken(device *Device, token string, expiration time.Time, u *User, s *S
 }
 
 func (t *DeviceToken) SetValid(valid bool) error {
-	t.Valid = valid
+	t.Valid = &valid
 	tx := db.Save(t)
 	return tx.Error
 }
 
 func (t *DeviceToken) IsExpired() bool {
-	return t.Valid && time.Now().After(t.Deadline)
+	return *t.Valid && time.Now().After(t.Deadline)
 }
 
 func (d *Device) SetDeviceStatus(status DeviceStatus) error {
