@@ -27,7 +27,7 @@ type Session struct {
 
 	Validate *bool `gorm:"default:true"`
 
-	Token string `gorm:"uniqueIndex"`
+	Token string `gorm:"uniqueIndex,type:varchar(1024)"`
 }
 
 func CreateSession(key []byte, u *User, s *Seat, startTime, endTime *time.Time) string {
