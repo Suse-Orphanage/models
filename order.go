@@ -62,3 +62,9 @@ func (o *Order) MarkPaid() error {
 	tx := db.Model(o).Update("status", OrderStatusPaid)
 	return tx.Error
 }
+
+func (u *User) ListOrders() ([]Order, error) {
+	orders := []Order{}
+	tx := db.Preload("Affiliate").Where("affiliate_id = ?", u.ID).Find(&orders)
+	return orders, tx.Error
+}
