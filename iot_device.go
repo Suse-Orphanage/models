@@ -109,7 +109,11 @@ func SaveToken(device *Device, token string, expiration time.Time, u *User, s *S
 		UserID:      u.ID,
 		SessionID:   s.ID,
 	})
-	return tx.Error
+	if tx.Error != nil {
+		return tx.Error
+	}
+	device.CurrentToken = token
+	return db.Save(&device).Error
 }
 
 func (t *DeviceToken) SetValid(valid bool) error {
