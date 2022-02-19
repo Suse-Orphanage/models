@@ -129,3 +129,16 @@ func ValidateSession(seatID uint, start, end *time.Time) bool {
 	}
 	return cnt == 0 && tx.Error == nil
 }
+
+func GetSessionViaUser(u *User) *Session {
+	session := u.Session
+	if session == "" {
+		return nil
+	}
+
+	s := GetSession(session)
+	if s == nil {
+		return nil
+	}
+	return s
+}

@@ -438,3 +438,13 @@ func (u *User) GetCurrentOccupiedDevices() []Device {
 
 	return ret
 }
+
+func (u *User) SetSession(s *Session) error {
+	u.Session = s.Token
+	return db.Save(u).Error
+}
+
+func (u *User) ClearSession() error {
+	u.Session = ""
+	return db.Save(u).Error
+}
