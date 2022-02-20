@@ -83,6 +83,8 @@ func UserHasValidNonceBefore(u *User) bool {
 }
 
 func GetRecentValidNonce(u *User) *DoorNonce {
+	CleanThoseExpired()
+
 	nonce := &DoorNonce{}
 	tx := db.First(&nonce, "user_id = ? AND valid = ? AND expire_time > ?", u.ID, true, time.Now())
 	if tx.RowsAffected == 0 {
