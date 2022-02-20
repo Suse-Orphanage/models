@@ -15,7 +15,7 @@ type DoorNonce struct {
 	User      User
 	UserID    uint `gorm:"not null"`
 	Session   *Session
-	SessionID uint
+	SessionID *uint
 
 	Valid bool `gorm:"default:true;primaryKey"`
 }
@@ -43,7 +43,9 @@ func CreateDoorNonce(user *User, session *Session) *DoorNonce {
 			ExpireTime:   time.Now().Add(time.Hour / 2),
 		}
 		if session != nil {
-			d.SessionID = session.ID
+			d.SessionID = &session.ID
+		} else {
+			d.SessionID = nil
 		}
 
 		tx := db.Create(d)
