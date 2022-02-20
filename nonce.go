@@ -20,23 +20,27 @@ type DoorNonce struct {
 	Valid bool `gorm:"default:true;primaryKey"`
 }
 
-func CreateDoorNonce(user *User, session *Session) string {
+func CreateDoorNonce(user *User, session *Session) *DoorNonce {
 	if n := GetRecentValidNonce(user); n != nil {
-		return n.Nonce
+		return n
 	}
 
 	work := false
-	var nonce string = ""
+	var d *DoorNonce = nil
+	var nonce string
 
 	for !work {
 		n := rand.Int() % 10000
 		nonce = fmt.Sprintf("%04d", n)
 
-		d := &DoorNonce{
+		d = &DoorNonce{
 			Nonce:  nonce,
 			User:   *user,
 			UserID: user.ID,
 			Valid:  true,
+
+			CreationTime: time.Now(),
+			ExpireTime:   time.Now().Add(time.Hour / 2),
 		}
 		if session != nil {
 			d.SessionID = session.ID
@@ -45,7 +49,7 @@ func CreateDoorNonce(user *User, session *Session) string {
 		tx := db.Create(d)
 		work = tx.Error == nil
 	}
-	return nonce
+	return d
 }
 
 func CleanThoseExpired() {
