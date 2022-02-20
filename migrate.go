@@ -38,6 +38,7 @@ func Migrate(connStr string) error {
 		&DynamicConfiguration{},
 		&Device{},
 		&DeviceToken{},
+		&DoorNonce{},
 	)
 
 	if err != nil {
