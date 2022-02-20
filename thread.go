@@ -183,9 +183,9 @@ func NewPost(title, content string, author uint) (*Thread, error) {
 
 	tx := db.Create(&thread)
 	if tx.Error != nil {
-		return &thread, nil
+		return nil, tx.Error
 	}
-	return nil, tx.Error
+	return &thread, nil
 }
 
 var CommentOnThread = ReplyToThread
