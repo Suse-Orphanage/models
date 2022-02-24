@@ -82,7 +82,7 @@ type User struct {
 	Status              UserStatus        `gorm:"default:0"`
 	BillingStatus       UserBillingStatus `gorm:"default:0"`
 	RecentBillStartTime *time.Time        `gorm:"default:NULL"`
-	Session             string            `gorm:"type:char(1024);default:''"`
+	Session             string            `gorm:"type:text;default:''"`
 
 	RemainingCredit Price `gorm:"default:0"`
 
