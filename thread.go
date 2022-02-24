@@ -16,8 +16,8 @@ const (
 )
 
 // 一个 Thread 可以是
-// 1. 一个帖子。此时 ParentID 和 ReplyID 都为 0, Level 为 1.
-// 2. 一个楼层。此时 ParentID 为 一楼的 ID，ReplyToID 为 0，Level 为 2.
+// 1. 一个帖子。此时 ParentID 和 ReplyID 都为 NULL, Level 为 1.
+// 2. 一个楼层。此时 ParentID 为 一楼的 ID，ReplyToID 为 NULL，Level 为 2.
 // 3. 一个楼层下的回复。此时 ParentID 为 楼层的 ID，ReplyToID 为回复对象的 ID 或楼层 ID，Level 为 3.
 type Thread struct {
 	gorm.Model
@@ -25,13 +25,15 @@ type Thread struct {
 	Likes     uint    `gorm:"default:0"`
 	Stars     uint    `gorm:"default:0"`
 	Title     string  `gorm:"type:varchar(20)"`
-	ParentID  uint    `gorm:"parent_id"`
+	ParentID  *uint   `gorm:"parent_id"`
 	Parent    *Thread `gorm:"foreignKey:ParentID;default:null;"`
-	ReplyToID uint    `gorm:"reply_to"`
+	ReplyToID *uint   `gorm:"reply_to"`
 	ReplyTo   *Thread `gorm:"foreignKey:ParentID;default:null;"`
 	AuthorID  uint
 	Author    *User `gorm:"foreignKey:AuthorID"`
 	Level     int   `gorm:"type:tinyint(1);default:1"`
+
+	Deleted bool `gorm:"default:false"`
 
 	LikedUser  []*User `gorm:"many2many:user_liked_thread;"`
 	StaredUser []*User `gorm:"many2many:user_stared_thread;"`
@@ -90,6 +92,8 @@ type Post struct {
 	LikedByMe  bool `json:"liked_by_me"`
 
 	Comments []Comment `json:"comments"`
+
+	Deleted bool `json:"deleted"`
 }
 
 func postLikedByUser(t *Thread, uid uint) bool {
@@ -163,7 +167,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 			comment.Replies[i] = Reply{
 				ID:      reply.ID,
 				Content: reply.Content,
-				ReplyTo: reply.ReplyToID,
+				ReplyTo: *reply.ReplyToID,
 				Author:  *reply.Author,
 			}
 		}
@@ -193,7 +197,7 @@ var CommentOnThread = ReplyToThread
 func ReplyToThread(thread uint, author uint, content string) error {
 	commentThread := Thread{
 		Content:  content,
-		ParentID: thread,
+		ParentID: &thread,
 		AuthorID: author,
 		Level:    ThreadLevelComment,
 	}
@@ -205,7 +209,7 @@ func ReplyToThread(thread uint, author uint, content string) error {
 func ReplyToComment(thread uint, author uint, replyTo uint, content string) error {
 	replyThread := Thread{
 		Content:  content,
-		ParentID: thread,
+		ParentID: &thread,
 		AuthorID: author,
 		Level:    ThreadLevelReply,
 	}
@@ -253,6 +257,19 @@ func StarThread(threadId uint, userId uint) error {
 	_ = db.First(&user, userId)
 	thread.StaredUser = append(thread.LikedUser, &user)
 	thread.Stars += 1
+	tx = db.Save(thread)
+
+	return tx.Error
+}
+
+func DeleteThread(id uint) error {
+	thread := Thread{}
+	tx := db.First(&thread, id)
+	if tx.Error != nil {
+		return NewRequestError("帖子不存在")
+	}
+
+	thread.Deleted = true
 	tx = db.Save(thread)
 
 	return tx.Error

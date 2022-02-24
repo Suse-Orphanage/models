@@ -71,7 +71,7 @@ type User struct {
 	Phone       string     `gorm:"type:char(11);uniqueIndex"`
 	Openid      string     `gorm:"type:char(32);index"`
 	Unionid     string     `gorm:"type:char(64);index"`
-	Session     string     `gorm:"type:varchar(64)"`
+	WxSession   string     `gorm:"type:varchar(64)"`
 	IsPro       bool       `gorm:"notNull;default:false"`
 	ProDeadline *time.Time `gorm:"default:NULL"`
 	Avatar      string     `gorm:"default:''"`
@@ -82,6 +82,7 @@ type User struct {
 	Status              UserStatus        `gorm:"default:0"`
 	BillingStatus       UserBillingStatus `gorm:"default:0"`
 	RecentBillStartTime *time.Time        `gorm:"default:NULL"`
+	Session             string            `gorm:"type:char(1024);default:''"`
 
 	RemainingCredit Price `gorm:"default:0"`
 
@@ -127,7 +128,7 @@ func NewWxUser(username, openid, unionid, session string) (*User, error) {
 		Bio:         "",
 		Openid:      openid,
 		Unionid:     unionid,
-		Session:     session,
+		WxSession:   session,
 		IsPro:       false,
 		ProDeadline: nil,
 		Avatar:      "",
@@ -146,7 +147,7 @@ func NewPhoneUser(username, phone string) (*User, error) {
 		Bio:         "",
 		Openid:      "",
 		Unionid:     "",
-		Session:     "",
+		WxSession:   "",
 		IsPro:       false,
 		ProDeadline: nil,
 		Avatar:      "",
@@ -446,5 +447,10 @@ func (u *User) SetSession(s *Session) error {
 
 func (u *User) ClearSession() error {
 	u.Session = ""
+	return db.Save(u).Error
+}
+
+func (u *User) SetWxSession(s string) error {
+	u.WxSession = s
 	return db.Save(u).Error
 }
