@@ -454,3 +454,35 @@ func (u *User) SetWxSession(s string) error {
 	u.WxSession = s
 	return db.Save(u).Error
 }
+
+type BasicUserInfomation struct {
+	ID       uint64 `json:"userid"`
+	Avatar   string `json:"avatar"`
+	Username string `json:"username"`
+	Bio      string `json:"bio"`
+	IsPro    bool   `json:"is_pro"`
+}
+
+func (u *User) GetFollowers() ([]BasicUserInfomation, error) {
+	ret := make([]BasicUserInfomation, 0)
+	tx := db.
+		Table("user_relations").
+		Find(&ret, "following_id = ?", u.ID)
+	if tx.Error != nil {
+		return []BasicUserInfomation{}, tx.Error
+	}
+
+	return ret, nil
+}
+
+func (u *User) GetFollowings() ([]BasicUserInfomation, error) {
+	ret := make([]BasicUserInfomation, 0)
+	tx := db.
+		Table("user_relations").
+		Find(&ret, "user_id = ?", u.ID)
+	if tx.Error != nil {
+		return []BasicUserInfomation{}, tx.Error
+	}
+
+	return ret, nil
+}
