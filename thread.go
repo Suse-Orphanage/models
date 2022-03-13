@@ -24,14 +24,14 @@ const (
 type Thread struct {
 	gorm.Model
 	Content   postgres.Jsonb `gorm:"type:jsonb;not null" sql:"DEFAULT '{}'::JSONB"`
-	Title     string         `gorm:"type:varchar(20)"`
-	ParentID  *uint          `gorm:"parent_id"`
-	Parent    *Thread        `gorm:"foreignKey:ParentID;default:null;"`
-	ReplyToID *uint          `gorm:"reply_to"`
-	ReplyTo   *Thread        `gorm:"foreignKey:ParentID;default:null;"`
-	AuthorID  uint
-	Author    *User `gorm:"foreignKey:AuthorID"`
-	Level     int   `gorm:"type:int;default:1"`
+	Title     string         `gorm:"type:varchar(20);not null"`
+	ParentID  *uint          `gorm:"default:null"`
+	Parent    *Thread
+	ReplyToID *uint `gorm:"deafault:null"`
+	ReplyTo   *Thread
+	AuthorID  uint `gorm:"not null"`
+	Author    *User
+	Level     int `gorm:"type:int;default:1"`
 
 	Deleted bool `gorm:"default:false"`
 }
@@ -190,7 +190,7 @@ func NewPost(title, content string, author uint) (*Thread, error) {
 		Level:    ThreadLevelPost,
 	}
 
-	tx := db.Create(&thread)
+	tx := db.Debug().Create(&thread)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
