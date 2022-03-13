@@ -31,7 +31,7 @@ type Thread struct {
 	ReplyTo   *Thread `gorm:"foreignKey:ParentID;default:null;"`
 	AuthorID  uint
 	Author    *User `gorm:"foreignKey:AuthorID"`
-	Level     int   `gorm:"type:tinyint(1);default:1"`
+	Level     int   `gorm:"type:int,default:1"`
 
 	Deleted bool `gorm:"default:false"`
 

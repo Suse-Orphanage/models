@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type File struct {
 	gorm.Model
-	UUID     string
+	UUID     string `gorm:"type:uuid"`
 	Filename string
 	Ext      string
 }

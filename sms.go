@@ -18,7 +18,7 @@ type ValidationCodeSms struct {
 	Code      string `gorm:"type:char(4)"`
 	ExpiresAt time.Time
 	Phone     string `gorm:"type:char(11);index"`
-	Used      bool   `gorm:"type:tinyint;default:false"`
+	Used      bool   `gorm:"type:bool;default:false"`
 }
 
 func (sms *ValidationCodeSms) SetStatusUsed() {
