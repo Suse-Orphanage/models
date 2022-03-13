@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/jinzhu/grom/dialets/postgres"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -21,7 +22,7 @@ const (
 // 3. 一个楼层下的回复。此时 ParentID 为 楼层的 ID，ReplyToID 为回复对象的 ID 或楼层 ID，Level 为 3.
 type Thread struct {
 	gorm.Model
-	Content string `gorm:"type:jsonb;not null" sql:"DEFAULT '{}'::JSONB"`
+	Content postgres.Jsonb `gorm:"type:jsonb;not null" sql:"DEFAULT '{}'::JSONB"`
 	// Likes     uint    `gorm:"default:0"`
 	// Stars     uint    `gorm:"default:0"`
 	Title     string  `gorm:"type:varchar(20)"`
