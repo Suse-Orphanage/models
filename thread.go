@@ -21,9 +21,9 @@ const (
 // 3. 一个楼层下的回复。此时 ParentID 为 楼层的 ID，ReplyToID 为回复对象的 ID 或楼层 ID，Level 为 3.
 type Thread struct {
 	gorm.Model
-	Content   string  `gorm:"type:json;default:{}"`
-	Likes     uint    `gorm:"default:0"`
-	Stars     uint    `gorm:"default:0"`
+	Content string `gorm:"type:json;default:{}"`
+	// Likes     uint    `gorm:"default:0"`
+	// Stars     uint    `gorm:"default:0"`
 	Title     string  `gorm:"type:varchar(20)"`
 	ParentID  *uint   `gorm:"parent_id"`
 	Parent    *Thread `gorm:"foreignKey:ParentID;default:null;"`
@@ -35,8 +35,8 @@ type Thread struct {
 
 	Deleted bool `gorm:"default:false"`
 
-	LikedUser  []*User `gorm:"many2many:user_liked_thread;"`
-	StaredUser []*User `gorm:"many2many:user_stared_thread;"`
+	// LikedUser  []*User `gorm:"many2many:user_liked_thread;"`
+	// StaredUser []*User `gorm:"many2many:user_stared_thread;"`
 }
 
 func GetThreadByID(id uint) *Thread {
@@ -96,23 +96,23 @@ type Post struct {
 	Deleted bool `json:"deleted"`
 }
 
-func postLikedByUser(t *Thread, uid uint) bool {
-	for _, u := range t.LikedUser {
-		if u.ID == uid {
-			return true
-		}
-	}
-	return false
-}
+// func postLikedByUser(t *Thread, uid uint) bool {
+// 	for _, u := range t.LikedUser {
+// 		if u.ID == uid {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
 
-func postStaredByUser(t *Thread, uid uint) bool {
-	for _, u := range t.StaredUser {
-		if u.ID == uid {
-			return true
-		}
-	}
-	return false
-}
+// func postStaredByUser(t *Thread, uid uint) bool {
+// 	for _, u := range t.StaredUser {
+// 		if u.ID == uid {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
 
 func ConstructPostObject(t Thread, uid uint) *Post {
 	threadId := t.ID
@@ -124,11 +124,11 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 		ID:         t.ID,
 		Title:      t.Title,
 		Content:    t.Content,
-		Likes:      t.Likes,
-		Stars:      t.Stars,
+		Likes:      FindThreadLikeCount(threadId),
+		Stars:      FindThreadStarCount(threadId),
 		Author:     *t.Author,
-		StaredByMe: postStaredByUser(&t, uid),
-		LikedByMe:  postLikedByUser(&t, uid),
+		StaredByMe: threadStaredByUser(threadId, uid),
+		LikedByMe:  threadLikedByUser(threadId, uid),
 	}
 
 	// find comments
@@ -147,8 +147,8 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 			ID:              commentThread.ID,
 			Content:         commentThread.Content,
 			Author:          *commentThread.Author,
-			Likes:           commentThread.Likes,
-			LikedByMe:       postLikedByUser(&commentThread, uid),
+			Likes:           FindThreadLikeCount(commentThread.ID),
+			LikedByMe:       threadLikedByUser(commentThread.ID, uid),
 			commentThreadId: commentThread.ID,
 		}
 	}
@@ -225,10 +225,6 @@ func LikeThread(threadId uint, userId uint) error {
 		return NewRequestError("帖子不存在")
 	}
 
-	if postLikedByUser(&thread, userId) {
-		return NewRequestError("不能重复点赞")
-	}
-
 	// user := User{}
 	// _ = db.First(&user, userId)
 	// thread.LikedUser = append(thread.LikedUser, &user)
@@ -257,10 +253,6 @@ func StarThread(threadId uint, userId uint) error {
 
 	if thread.Level != ThreadLevelPost {
 		return NewRequestError("不能收藏评论")
-	}
-
-	if postLikedByUser(&thread, userId) {
-		return NewRequestError("你已经收藏过该帖子")
 	}
 
 	// user := User{}

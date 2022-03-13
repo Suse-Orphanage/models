@@ -37,8 +37,14 @@ func FindThreadLikeForUser(uid uint) ([]ThreadLike, error) {
 	return tls, err
 }
 
-func FindThreadLikeCount(threadID uint) (uint, error) {
+func FindThreadLikeCount(threadID uint) uint {
 	var count int64 = 0
-	err := db.Model(ThreadLike{}).Where("thread_id = ?", threadID).Count(&count).Error
-	return uint(count), err
+	_ = db.Model(ThreadLike{}).Where("thread_id = ?", threadID).Count(&count).Error
+	return uint(count)
+}
+
+func threadLikedByUser(threadId, userId uint) bool {
+	var count int64 = 0
+	_ = db.Model(ThreadLike{}).Where("thread_id = ? AND user_id = ?", threadId, userId).Count(&count).Error
+	return count > 0
 }

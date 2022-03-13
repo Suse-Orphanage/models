@@ -39,6 +39,8 @@ func Migrate(connStr string) error {
 		&Device{},
 		&DeviceToken{},
 		&DoorNonce{},
+		&ThreadStar{},
+		&ThreadLike{},
 	)
 
 	if err != nil {
