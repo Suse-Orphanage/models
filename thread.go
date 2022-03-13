@@ -139,7 +139,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 
 	// find comments
 	commentThreads := make([]Thread, 0)
-	tx := db.Where("parent_id = ?", threadId).Order("LikeCount desc").Find(&commentThreads)
+	tx := db.Where("parent_id = ?", threadId).Order("like_count desc").Find(&commentThreads)
 
 	if tx.Error != nil {
 		logrus.Error(tx.Error)
