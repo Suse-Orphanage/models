@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"regexp"
 	"strconv"
 
@@ -40,6 +41,14 @@ type Thread struct {
 	// StaredUser []*User `gorm:"many2many:user_stared_thread;"`
 }
 
+func String2Jsonb(s string) postgres.Jsonb {
+	return postgres.Jsonb{RawMessage: json.RawMessage(s)}
+}
+
+func Jsonb2RawMessage(j postgres.Jsonb) json.RawMessage {
+	return j.RawMessage
+}
+
 func GetThreadByID(id uint) *Thread {
 	thread := Thread{}
 	tx := db.First(&thread, id)
@@ -64,30 +73,30 @@ func SearchThread(keyword string, uid, page uint) []*Post {
 }
 
 type Reply struct {
-	ID      uint   `json:"id"`
-	Content string `json:"content"`
-	ReplyTo uint   `json:"reply_to"`
-	Author  User   `json:"author"`
+	ID      uint            `json:"id"`
+	Content json.RawMessage `json:"content"`
+	ReplyTo uint            `json:"reply_to"`
+	Author  User            `json:"author"`
 }
 
 type Comment struct {
-	ID        uint    `json:"id"`
-	Content   string  `json:"content"`
-	Replies   []Reply `json:"reply_to"`
-	Author    User    `json:"author"`
-	Likes     uint    `json:"likes"`
-	LikedByMe bool    `json:"liked_by_me"`
+	ID        uint            `json:"id"`
+	Content   json.RawMessage `json:"content"`
+	Replies   []Reply         `json:"reply_to"`
+	Author    User            `json:"author"`
+	Likes     uint            `json:"likes"`
+	LikedByMe bool            `json:"liked_by_me"`
 
 	commentThreadId uint
 }
 
 type Post struct {
-	ID      uint   `json:"id"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	Likes   uint   `json:"likes"`
-	Stars   uint   `json:"stars"`
-	Author  User   `json:"author"`
+	ID      uint            `json:"id"`
+	Title   string          `json:"title"`
+	Content json.RawMessage `json:"content"`
+	Likes   uint            `json:"likes"`
+	Stars   uint            `json:"stars"`
+	Author  User            `json:"author"`
 
 	StaredByMe bool `json:"stared_by_me"`
 	LikedByMe  bool `json:"liked_by_me"`
@@ -124,7 +133,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 	res := Post{
 		ID:         t.ID,
 		Title:      t.Title,
-		Content:    t.Content,
+		Content:    Jsonb2RawMessage(t.Content),
 		Likes:      FindThreadLikeCount(threadId),
 		Stars:      FindThreadStarCount(threadId),
 		Author:     *t.Author,
@@ -146,7 +155,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 	for i, commentThread := range commentThreads {
 		comments[i] = Comment{
 			ID:              commentThread.ID,
-			Content:         commentThread.Content,
+			Content:         Jsonb2RawMessage(commentThread.Content),
 			Author:          *commentThread.Author,
 			Likes:           FindThreadLikeCount(commentThread.ID),
 			LikedByMe:       threadLikedByUser(commentThread.ID, uid),
@@ -167,7 +176,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 		for i, reply := range replyThreads {
 			comment.Replies[i] = Reply{
 				ID:      reply.ID,
-				Content: reply.Content,
+				Content: Jsonb2RawMessage(reply.Content),
 				ReplyTo: *reply.ReplyToID,
 				Author:  *reply.Author,
 			}
@@ -181,7 +190,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 func NewPost(title, content string, author uint) (*Thread, error) {
 	thread := Thread{
 		Title:    title,
-		Content:  content,
+		Content:  String2Jsonb(content),
 		AuthorID: author,
 		Level:    ThreadLevelPost,
 	}
@@ -197,7 +206,7 @@ var CommentOnThread = ReplyToThread
 
 func ReplyToThread(thread uint, author uint, content string) error {
 	commentThread := Thread{
-		Content:  content,
+		Content:  String2Jsonb(content),
 		ParentID: &thread,
 		AuthorID: author,
 		Level:    ThreadLevelComment,
@@ -209,7 +218,7 @@ func ReplyToThread(thread uint, author uint, content string) error {
 
 func ReplyToComment(thread uint, author uint, replyTo uint, content string) error {
 	replyThread := Thread{
-		Content:  content,
+		Content:  String2Jsonb(content),
 		ParentID: &thread,
 		AuthorID: author,
 		Level:    ThreadLevelReply,
