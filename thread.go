@@ -23,23 +23,12 @@ const (
 // 3. 一个楼层下的回复。此时 ParentID 为 楼层的 ID，ReplyToID 为回复对象的 ID 或楼层 ID，Level 为 3.
 type Thread struct {
 	gorm.Model
-<<<<<<< HEAD
 	Content   postgres.Jsonb `gorm:"type:jsonb;not null" sql:"DEFAULT '{}'::JSONB"`
 	Title     string         `gorm:"type:varchar(20)"`
 	ParentID  *uint          `gorm:"parent_id"`
 	Parent    *Thread        `gorm:"foreignKey:ParentID;default:null;"`
 	ReplyToID *uint          `gorm:"reply_to"`
 	ReplyTo   *Thread        `gorm:"foreignKey:ParentID;default:null;"`
-=======
-	Content postgres.Jsonb `gorm:"not null" sql:"DEFAULT '{}'::JSONB"`
-	// Likes     uint    `gorm:"default:0"`
-	// Stars     uint    `gorm:"default:0"`
-	Title     string  `gorm:"type:varchar(20)"`
-	ParentID  *uint   `gorm:"parent_id"`
-	Parent    *Thread `gorm:"foreignKey:ParentID;default:null;"`
-	ReplyToID *uint   `gorm:"reply_to"`
-	ReplyTo   *Thread `gorm:"foreignKey:ParentID;default:null;"`
->>>>>>> 4c2ec08ef6da3c5f49058f298b8f1b24a87eb813
 	AuthorID  uint
 	Author    *User `gorm:"foreignKey:AuthorID"`
 	Level     int   `gorm:"type:int;default:1"`
