@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/jinzhu/grom/dialets/postgres"
+	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
