@@ -2,13 +2,13 @@ package models
 
 import (
 	"github.com/sirupsen/logrus"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func Migrate(connStr string) error {
 	logrus.Info("Start migration.")
-	db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	if err != nil {
 		return err
 	}
