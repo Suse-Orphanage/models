@@ -24,6 +24,7 @@ const (
 type Thread struct {
 	gorm.Model
 	Content   postgres.Jsonb `gorm:"type:jsonb;not null" sql:"DEFAULT '{}'::JSONB"`
+	LikeCount uint           `gorm:"default:0"`
 	Title     string         `gorm:"type:varchar(20);not null"`
 	ParentID  *uint          `gorm:"default:null"`
 	Parent    *Thread
