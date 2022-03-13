@@ -221,7 +221,7 @@ func ReplyToComment(thread uint, author uint, replyTo uint, content string) erro
 func LikeThread(threadId uint, userId uint) error {
 	thread := Thread{}
 	tx := db.First(&thread, threadId)
-	if tx.Error != nil {
+	if tx.Error != nil || thread.Deleted {
 		return NewRequestError("帖子不存在")
 	}
 
@@ -229,19 +229,29 @@ func LikeThread(threadId uint, userId uint) error {
 		return NewRequestError("不能重复点赞")
 	}
 
-	user := User{}
-	_ = db.First(&user, userId)
-	thread.LikedUser = append(thread.LikedUser, &user)
-	thread.Likes += 1
-	tx = db.Save(thread)
+	// user := User{}
+	// _ = db.First(&user, userId)
+	// thread.LikedUser = append(thread.LikedUser, &user)
+	// thread.Likes += 1
+	// tx = db.Save(thread)
 
-	return tx.Error
+	return CreateThreadLike(threadId, userId)
+}
+
+func UnlikeThread(threadId uint, userId uint) error {
+	thread := Thread{}
+	tx := db.First(&thread, threadId)
+	if tx.Error != nil || thread.Deleted {
+		return NewRequestError("帖子不存在")
+	}
+
+	return DeleteThreadLikeOfThreadForUser(threadId, userId)
 }
 
 func StarThread(threadId uint, userId uint) error {
 	thread := Thread{}
 	tx := db.First(&thread, threadId)
-	if tx.Error != nil {
+	if tx.Error != nil || thread.Deleted {
 		return NewRequestError("帖子不存在")
 	}
 
@@ -253,13 +263,25 @@ func StarThread(threadId uint, userId uint) error {
 		return NewRequestError("你已经收藏过该帖子")
 	}
 
-	user := User{}
-	_ = db.First(&user, userId)
-	thread.StaredUser = append(thread.LikedUser, &user)
-	thread.Stars += 1
-	tx = db.Save(thread)
+	// user := User{}
+	// _ = db.First(&user, userId)
+	// thread.StaredUser = append(thread.LikedUser, &user)
+	// thread.Stars += 1
+	// tx = db.Save(thread)
 
-	return tx.Error
+	// return tx.Error
+
+	return CreateThreadStar(threadId, userId)
+}
+
+func UnstarThread(threadId uint, userId uint) error {
+	thread := Thread{}
+	tx := db.First(&thread, threadId)
+	if tx.Error != nil {
+		return NewRequestError("帖子不存在")
+	}
+
+	return DeleteThreadStarOfThreadForUser(threadId, userId)
 }
 
 func DeleteThread(id uint) error {

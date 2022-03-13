@@ -10,10 +10,10 @@ type ThreadStar struct {
 	User     User
 }
 
-func CreateThreadStar(t *Thread, u *User) error {
+func CreateThreadStar(threadId, userId uint) error {
 	tl := ThreadStar{
-		ThreadID: t.ID,
-		UserID:   u.ID,
+		ThreadID: threadId,
+		UserID:   userId,
 	}
 
 	return db.Save(tl).Error
