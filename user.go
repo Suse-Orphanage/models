@@ -69,8 +69,8 @@ type User struct {
 	Salt        string     `gorm:"type:char(10)"`
 	Bio         string     `gorm:"type:varchar(255)"`
 	Phone       string     `gorm:"type:char(11);uniqueIndex"`
-	Openid      string     `gorm:"type:char(32);index"`
-	Unionid     string     `gorm:"type:char(64);index"`
+	Openid      string     `gorm:"type:varchar(32);index"`
+	Unionid     string     `gorm:"type:varchar(64);index"`
 	WxSession   string     `gorm:"type:varchar(64)"`
 	IsPro       bool       `gorm:"notNull;default:false"`
 	ProDeadline *time.Time `gorm:"default:NULL"`
