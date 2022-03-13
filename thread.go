@@ -46,7 +46,7 @@ func Jsonb2RawMessage(j postgres.Jsonb) json.RawMessage {
 
 func GetThreadByID(id uint) *Thread {
 	thread := Thread{}
-	tx := db.First(&thread, id)
+	tx := db.Preload("Author").First(&thread, id)
 	if tx.Error != nil {
 		return nil
 	} else {
