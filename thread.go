@@ -58,7 +58,7 @@ func GetThreadByID(id uint) *Thread {
 func SearchThread(keyword string, uid, page uint) []*Post {
 	res := make([]*Post, 0)
 
-	db.Where("title like ? AND level = 1", "%"+keyword+"%").Limit(10).Find(&res)
+	db.Where("title like ? AND level = 1 AND deleted = false", "%"+keyword+"%").Limit(10).Find(&res)
 
 	ok, _ := regexp.Match("\\d+", []byte(keyword))
 	if ok {
@@ -139,7 +139,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 
 	// find comments
 	commentThreads := make([]Thread, 0)
-	tx := db.Preload("Author").Where("parent_id = ?", threadId).Order("like_count desc").Find(&commentThreads)
+	tx := db.Preload("Author").Where("parent_id = ? AND deleted = false", threadId).Order("like_count desc").Find(&commentThreads)
 
 	if tx.Error != nil {
 		logrus.Error(tx.Error)
@@ -162,7 +162,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 	// find replies for each comment
 	for _, comment := range comments {
 		replyThreads := make([]Thread, 0)
-		tx := db.Preload("Author").Where("parent_id = ?", comment.commentThreadId).Find(&replyThreads)
+		tx := db.Preload("Author").Where("parent_id = ? AND deleted = false", comment.commentThreadId).Find(&replyThreads)
 		if tx.Error != nil {
 			logrus.Error(tx.Error)
 			return nil
