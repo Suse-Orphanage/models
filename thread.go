@@ -139,7 +139,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 
 	// find comments
 	commentThreads := make([]Thread, 0)
-	tx := db.Where("parent_id = ?", threadId).Order("like_count desc").Find(&commentThreads)
+	tx := db.Preload("Author").Where("parent_id = ?", threadId).Order("like_count desc").Find(&commentThreads)
 
 	if tx.Error != nil {
 		logrus.Error(tx.Error)
@@ -162,7 +162,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 	// find replies for each comment
 	for _, comment := range comments {
 		replyThreads := make([]Thread, 0)
-		tx := db.Where("parent_id = ?", comment.commentThreadId).Find(&replyThreads)
+		tx := db.Preload("Author").Where("parent_id = ?", comment.commentThreadId).Find(&replyThreads)
 		if tx.Error != nil {
 			logrus.Error(tx.Error)
 			return nil
