@@ -212,12 +212,25 @@ func ReplyToThread(thread uint, author uint, content string) error {
 	return tx.Error
 }
 
-func ReplyToComment(thread uint, author uint, replyTo uint, content string) error {
+func ReplyToComment(comment, author uint, content string) error {
 	replyThread := Thread{
 		Content:  String2Jsonb(content),
-		ParentID: &thread,
+		ParentID: &comment,
 		AuthorID: author,
 		Level:    ThreadLevelReply,
+	}
+
+	tx := db.Create(&replyThread)
+	return tx.Error
+}
+
+func ReplyToReply(comment, author, replyTo uint, content string) error {
+	replyThread := Thread{
+		Content:   String2Jsonb(content),
+		ParentID:  &comment,
+		ReplyToID: &replyTo,
+		AuthorID:  author,
+		Level:     ThreadLevelReply,
 	}
 
 	tx := db.Create(&replyThread)
