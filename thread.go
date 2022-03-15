@@ -56,9 +56,13 @@ func GetThreadByID(id uint) *Thread {
 }
 
 func SearchThread(keyword string, uid, page uint) []*Post {
-	res := make([]*Post, 0)
+	threads := make([]*Thread, 0)
 
-	db.Where("title like ? AND level = 1 AND deleted = false", "%"+keyword+"%").Limit(10).Find(&res)
+	db.Where("title like ? AND level = 1 AND deleted = false", "%"+keyword+"%").Limit(10).Find(&threads)
+	res := make([]*Post, len(threads))
+	for i, thread := range threads {
+		res[i] = ConstructPostObject(*thread, uid)
+	}
 
 	ok, _ := regexp.Match("\\d+", []byte(keyword))
 	if ok {
@@ -191,7 +195,7 @@ func NewPost(title, content string, author uint) (*Thread, error) {
 		Level:    ThreadLevelPost,
 	}
 
-	tx := db.Debug().Create(&thread)
+	tx := db.Create(&thread)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
