@@ -47,3 +47,16 @@ func threadStaredByUser(threadId, userId uint) bool {
 	_ = db.Model(ThreadStar{}).Where("thread_id = ? AND user_id = ?", threadId, userId).Count(&count).Error
 	return count > 0
 }
+
+func GetUserStaredThreads(uid uint, page int) ([]*Post, error) {
+	const perPage = 10
+	threads := make([]Thread, 0)
+	tx := db.Where("user = ?", uid).Limit(perPage).Offset(perPage * (page - 1)).Find(&threads)
+
+	posts := make([]*Post, len(threads))
+	for i, thread := range threads {
+		posts[i] = ConstructPostObject(thread, uid)
+	}
+
+	return posts, tx.Error
+}
