@@ -58,7 +58,7 @@ func GetThreadByID(id uint) *Thread {
 func SearchThread(keyword string, uid, page uint) []*Post {
 	threads := make([]*Thread, 0)
 
-	db.Where("title like ? AND level = 1 AND deleted = false", "%"+keyword+"%").Limit(10).Find(&threads)
+	db.Preload("Author").Where("title like ? AND level = 1 AND deleted = false", "%"+keyword+"%").Limit(10).Find(&threads)
 	res := make([]*Post, len(threads))
 	for i, thread := range threads {
 		res[i] = ConstructPostObject(*thread, uid)
