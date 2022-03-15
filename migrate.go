@@ -41,6 +41,7 @@ func Migrate(connStr string) error {
 		&DoorNonce{},
 		&ThreadStar{},
 		&ThreadLike{},
+		&Event{},
 	)
 
 	if err != nil {
