@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"regexp"
 	"strconv"
 
@@ -310,4 +311,18 @@ func DeleteThread(id uint) error {
 	tx = db.Save(thread)
 
 	return tx.Error
+}
+
+func GetRandomThreads(count int, uid uint) ([]*Post, error) {
+	if count <= 0 {
+		return nil, errors.New("count must be greater than 0")
+	}
+	threads := make([]Thread, 0)
+	tx := db.Preload("Author").Where("deleted = false AND level = 1").Order("RAND()").Limit(count).Find(&threads)
+
+	posts := make([]*Post, len(threads))
+	for i, thread := range threads {
+		posts[i] = ConstructPostObject(thread, uid)
+	}
+	return posts, tx.Error
 }
