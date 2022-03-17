@@ -51,7 +51,7 @@ func threadStaredByUser(threadId, userId uint) bool {
 func GetUserStaredThreads(uid uint, page int) ([]*Post, error) {
 	const perPage = 10
 	threadStars := make([]ThreadStar, 0)
-	tx := db.Where("user_id = ?", uid).Limit(perPage).Offset(perPage * (page - 1)).Find(&threads)
+	tx := db.Where("user_id = ?", uid).Limit(perPage).Offset(perPage * (page - 1)).Find(&threadStars)
 
 	posts := make([]*Post, len(threadStars))
 	for i, star := range threadStars {
