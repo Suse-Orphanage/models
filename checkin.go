@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/sirupsen/logrus"
+)
 
 type CheckIn struct {
 	Year      uint      `gorm:"primaryKey"`
@@ -34,6 +38,11 @@ func NewCheckIn(user uint) error {
 
 	if cnt != 0 {
 		return NewRequestError("今天已经签过到了")
+	}
+
+	if tx.Error != nil {
+		logrus.WithError(tx.Error).Error("error on handling NewCheckIn")
+		return tx.Error
 	}
 
 	return db.Create(record).Error
