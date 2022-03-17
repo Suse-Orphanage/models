@@ -20,15 +20,19 @@ func NewCheckIn(user uint) error {
 		User:      user,
 	}
 
-	tx := db.First(&CheckIn{},
-		"year = ? AND month = ? AND day = ? AND user = ?",
-		record.Year,
-		record.Month,
-		record.Day,
-		record.User,
-	)
+	var cnt int64
+	tx := db.
+		Model(&CheckIn{}).
+		Where(
+			"year = ? AND month = ? AND day = ? AND user = ?",
+			record.Year,
+			record.Month,
+			record.Day,
+			record.User,
+		).
+		Count(&cnt)
 
-	if tx.Error != nil {
+	if cnt != 0 {
 		return NewRequestError("今天已经签过到了")
 	}
 
