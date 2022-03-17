@@ -42,6 +42,7 @@ func Migrate(connStr string) error {
 		&ThreadStar{},
 		&ThreadLike{},
 		&Event{},
+		&AccessStatistic{},
 	)
 
 	if err != nil {
