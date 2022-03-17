@@ -15,6 +15,7 @@ type AccessStatistic struct {
 	Method    string `gorm:"type:text"`
 	Status    int
 	Referer   string `gorm:"type:text"`
+	UserID    *uint
 	User      *User
 }
 
