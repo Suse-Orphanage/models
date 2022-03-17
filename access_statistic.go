@@ -18,6 +18,6 @@ type AccessStatistic struct {
 	User      *User
 }
 
-func AddStatisticInBatch(stats []AccessStatistic) {
-	db.Create(&stats)
+func AddStatisticInBatch(stats []AccessStatistic) error {
+	return db.Create(&stats).Error
 }
