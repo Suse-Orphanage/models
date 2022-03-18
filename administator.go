@@ -47,3 +47,14 @@ func MatchAny(username, password string) (*Administrator, error) {
 	}
 	return &u, nil
 }
+
+func GetAdmin(id uint) (*Administrator, error) {
+	u := Administrator{}
+	tx := db.
+		Where("id = ?", id).
+		First(&u)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return &u, nil
+}
