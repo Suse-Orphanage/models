@@ -56,7 +56,7 @@ func GetCheckInHistory(uid int, beforeYear, beforeMonth, beforeDay int) ([]*Chec
 	tx := db.
 		Where("user = ? AND exact_time <= ? AND exact_time >= ?", uid, end, start).
 		Omit("user").
-		Order("ExactTime DESC").
+		Order("exact_time DESC").
 		Find(&result)
 	return result, tx.Error
 }
