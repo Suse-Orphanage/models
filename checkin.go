@@ -7,10 +7,11 @@ import (
 )
 
 type CheckIn struct {
-	Year      uint      `gorm:"primaryKey"`
-	Month     uint      `gorm:"primaryKey"`
-	Day       uint      `gorm:"primaryKey"`
-	User      uint      `gorm:"primaryKey" json:"-"`
+	Year      uint `gorm:"primaryKey"`
+	Month     uint `gorm:"primaryKey"`
+	Day       uint `gorm:"primaryKey"`
+	UserID    uint `gorm:"primaryKey" json:"-"`
+	User      User
 	ExactTime time.Time `json:"-"`
 }
 
@@ -21,18 +22,18 @@ func NewCheckIn(user uint) error {
 		Month:     uint(now.Month()),
 		Day:       uint(now.Day()),
 		ExactTime: now,
-		User:      user,
+		UserID:    user,
 	}
 
 	var cnt int64
 	tx := db.
 		Model(&CheckIn{}).
 		Where(
-			"year = ? AND month = ? AND day = ? AND user = ?",
+			"year = ? AND month = ? AND day = ? AND user_id = ?",
 			record.Year,
 			record.Month,
 			record.Day,
-			record.User,
+			record.UserID,
 		).
 		Count(&cnt)
 
