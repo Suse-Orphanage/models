@@ -67,3 +67,16 @@ func GetStatisticInBatchBeforeAfter(before, after uint) ([]AccessStatistic, erro
 	}
 	return result, nil
 }
+
+func GetLatestStatistic() ([]AccessStatistic, error) {
+	result := make([]AccessStatistic, 0)
+	tx := db.
+		Model(&AccessStatistic{}).
+		Limit(10).
+		Order("id desc").
+		Find(&result)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return result, nil
+}
