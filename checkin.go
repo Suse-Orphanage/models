@@ -49,13 +49,13 @@ func NewCheckIn(user uint) error {
 	return db.Create(record).Error
 }
 
-func GetCheckInHistory(uid int, beforeYear, beforeMonth, beforeDay int) ([]*CheckIn, error) {
+func GetCheckInHistory(uid uint, beforeYear, beforeMonth, beforeDay int) ([]*CheckIn, error) {
 	result := make([]*CheckIn, 0)
 	end := time.Date(int(beforeYear), time.Month(beforeMonth), int(beforeDay), 23, 59, 59, 0, time.Local)
 	start := end.AddDate(0, 0, -31)
 	tx := db.
-		Where("user = ? AND exact_time <= ? AND exact_time >= ?", uid, end, start).
-		Omit("user").
+		Where("user_id = ? AND exact_time <= ? AND exact_time >= ?", uid, end, start).
+		Omit("user_id").
 		Order("exact_time DESC").
 		Find(&result)
 	return result, tx.Error
