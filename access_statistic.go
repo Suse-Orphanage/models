@@ -22,3 +22,48 @@ type AccessStatistic struct {
 func AddStatisticInBatch(stats []AccessStatistic) error {
 	return db.Create(&stats).Error
 }
+
+func GetStatisticInBatchBefore(before uint) ([]AccessStatistic, error) {
+	result := make([]AccessStatistic, 0)
+	tx := db.
+		Model(&AccessStatistic{}).
+		Where("id < ?", before).
+		Limit(10).
+		Order("id desc").
+		Find(&result)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return result, nil
+}
+
+func GetStatisticInBatchAfter(after uint) ([]AccessStatistic, error) {
+	result := make([]AccessStatistic, 0)
+	tx := db.
+		Model(&AccessStatistic{}).
+		Where("id > ?", after).
+		Limit(10).
+		Order("id asc").
+		Find(&result)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return result, nil
+}
+
+func GetStatisticInBatchBeforeAfter(before, after uint) ([]AccessStatistic, error) {
+	if before >= after {
+		return []AccessStatistic{}, nil
+	}
+	result := make([]AccessStatistic, 0)
+	tx := db.
+		Model(&AccessStatistic{}).
+		Where("id < ? and id > ?", before, after).
+		Limit(10).
+		Order("id desc").
+		Find(&result)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return result, nil
+}
