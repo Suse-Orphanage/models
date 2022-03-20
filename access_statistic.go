@@ -95,7 +95,7 @@ func GetHourlyReport() ([]ASReport, error) {
 		Select("date_trunc('day', time) day, COUNT(*) cnt").
 		Group("day").
 		Order("day").
-		Limit(60).
+		Limit(24).
 		Find(&res)
 	return res, tx.Error
 }
@@ -107,7 +107,7 @@ func GetDailyReport() ([]ASReport, error) {
 		Select("date_trunc('day', time) day, COUNT(*) cnt, MAX(id) id_start, MIN(id) id_end").
 		Group("day").
 		Order("day").
-		Limit(60).
+		Limit(30).
 		Find(&res)
 	return res, tx.Error
 }
@@ -119,7 +119,7 @@ func GetMonthlyReport() ([]ASReport, error) {
 		Select("date_trunc('month', time) month, COUNT(*) cnt").
 		Group("month").
 		Order("month").
-		Limit(60).
+		Limit(3).
 		Find(&res)
 	return res, tx.Error
 }
