@@ -28,7 +28,7 @@ func ListCheckin(limit, page uint) []*CheckIn {
 	return result
 }
 
-// =================== =======================
+// =================== Configuration =======================
 func ListConfiguration(limit, page uint) []*DynamicConfiguration {
 	result := make([]*DynamicConfiguration, 0)
 	_ = db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
