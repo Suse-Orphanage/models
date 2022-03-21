@@ -21,6 +21,7 @@ func ListAdministrator(limit, page uint) ([]*Administrator, error) {
 }
 
 func UpdateAdministrator(admin *Administrator) error {
+	admin.Password = encryptPassword(admin.Password, admin.Salt)
 	return db.Save(admin).Error
 }
 
