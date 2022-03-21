@@ -94,7 +94,7 @@ func GetHourlyReport() ([]ASReport, error) {
 		Model(&AccessStatistic{}).
 		Select("date_trunc('hour', time) t, COUNT(*) cnt, MAX(id) id_start, MIN(id) id_end").
 		Group("t").
-		Order("t").
+		Order("t desc").
 		Limit(24).
 		Find(&res)
 	return res, tx.Error
@@ -106,7 +106,7 @@ func GetDailyReport() ([]ASReport, error) {
 		Model(&AccessStatistic{}).
 		Select("date_trunc('day', time) t, COUNT(*) cnt, MAX(id) id_start, MIN(id) id_end").
 		Group("t").
-		Order("t").
+		Order("t desc").
 		Limit(30).
 		Find(&res)
 	return res, tx.Error
@@ -118,7 +118,7 @@ func GetMonthlyReport() ([]ASReport, error) {
 		Model(&AccessStatistic{}).
 		Select("date_trunc('month', time) t, COUNT(*) cnt, MAX(id) id_start, MIN(id) id_end").
 		Group("t").
-		Order("t").
+		Order("t desc").
 		Limit(3).
 		Find(&res)
 	return res, tx.Error
