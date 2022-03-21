@@ -86,6 +86,12 @@ func DeleteEvent(id uint) error {
 	return db.Model(&Event{}).Where("id = ?", id).Delete(&Event{}).Error
 }
 
+func GetEvent(id uint) (*Event, error) {
+	result := &Event{}
+	err := db.Where("id = ?", id).First(result).Error
+	return result, err
+}
+
 // ================== Good ====================
 
 func ListGoods(limit, page uint) ([]*Good, error) {
