@@ -198,3 +198,10 @@ func UpdateStore(store *Store) error {
 func DeleteStore(id uint) error {
 	return db.Model(&Store{}).Where("id = ?", id).Delete(&Store{}).Error
 }
+
+// ==================== Thread ====================
+func ListThread(limit, page uint) ([]*Thread, error) {
+	result := make([]*Thread, 0)
+	tx := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
+	return result, tx.Error
+}
