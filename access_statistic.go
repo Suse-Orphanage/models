@@ -82,19 +82,19 @@ func GetLatestStatistic() ([]AccessStatistic, error) {
 }
 
 type ASReport struct {
-	Day     time.Time `gorm:"column:day"`
-	Count   int       `gorm:"column:cnt"`
-	IdStart uint      `gorm:"column:id_start"`
-	IdEnd   uint      `gorm:"column:id_end"`
+	Time    time.Time `gorm:"column:t" json:"time"`
+	Count   int       `gorm:"column:cnt" json:"count"`
+	IdStart uint      `gorm:"column:id_start" json:"id_start"`
+	IdEnd   uint      `gorm:"column:id_end" json:"id_end"`
 }
 
 func GetHourlyReport() ([]ASReport, error) {
 	res := make([]ASReport, 0)
 	tx := db.
 		Model(&AccessStatistic{}).
-		Select("date_trunc('day', time) day, COUNT(*) cnt").
-		Group("day").
-		Order("day").
+		Select("date_trunc('hour', time) t, COUNT(*) cnt, MAX(id) id_start, MIN(id) id_end").
+		Group("t").
+		Order("t").
 		Limit(24).
 		Find(&res)
 	return res, tx.Error
@@ -104,9 +104,9 @@ func GetDailyReport() ([]ASReport, error) {
 	res := make([]ASReport, 0)
 	tx := db.
 		Model(&AccessStatistic{}).
-		Select("date_trunc('day', time) day, COUNT(*) cnt, MAX(id) id_start, MIN(id) id_end").
-		Group("day").
-		Order("day").
+		Select("date_trunc('day', time) t, COUNT(*) cnt, MAX(id) id_start, MIN(id) id_end").
+		Group("t").
+		Order("t").
 		Limit(30).
 		Find(&res)
 	return res, tx.Error
@@ -116,9 +116,9 @@ func GetMonthlyReport() ([]ASReport, error) {
 	res := make([]ASReport, 0)
 	tx := db.
 		Model(&AccessStatistic{}).
-		Select("date_trunc('month', time) month, COUNT(*) cnt").
-		Group("month").
-		Order("month").
+		Select("date_trunc('month', time) t, COUNT(*) cnt, MAX(id) id_start, MIN(id) id_end").
+		Group("t").
+		Order("t").
 		Limit(3).
 		Find(&res)
 	return res, tx.Error
