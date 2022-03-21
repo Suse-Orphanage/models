@@ -65,10 +65,10 @@ type User struct {
 	gorm.Model
 	Type        UserType   `gorm:"type:int;notNull"`
 	Username    string     `gorm:"type:varchar(32)"`
-	Password    string     `gorm:"type:char(64)"`
-	Salt        string     `gorm:"type:char(10)"`
+	Password    string     `gorm:"type:varchar(64)"`
+	Salt        string     `gorm:"type:varchar(10)"`
 	Bio         string     `gorm:"type:varchar(255)"`
-	Phone       string     `gorm:"type:char(11);uniqueIndex"`
+	Phone       string     `gorm:"type:varchar(11);uniqueIndex"`
 	Openid      string     `gorm:"type:varchar(32);index"`
 	Unionid     string     `gorm:"type:varchar(64);index"`
 	WxSession   string     `gorm:"type:varchar(64)"`

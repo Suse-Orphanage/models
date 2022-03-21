@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 // ================== Administator ==================
 func AddAdministrator(username, password, email string) error {
@@ -11,10 +14,10 @@ func DeleteAdministrator(id uint) error {
 	return db.Model(&Administrator{}).Where("id = ?", id).Delete(&Administrator{}).Error
 }
 
-func ListAdministrator(limit, page uint) []*Administrator {
+func ListAdministrator(limit, page uint) ([]*Administrator, error) {
 	result := make([]*Administrator, 0)
-	_ = db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
-	return result
+	tx := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
+	return result, tx.Error
 }
 
 func UpdateAdministrator(admin *Administrator) error {
@@ -22,17 +25,17 @@ func UpdateAdministrator(admin *Administrator) error {
 }
 
 // ================== Checkin ==================
-func ListCheckin(limit, page uint) []*CheckIn {
+func ListCheckin(limit, page uint) ([]*CheckIn, error) {
 	result := make([]*CheckIn, 0)
-	_ = db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
-	return result
+	tx := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
+	return result, tx.Error
 }
 
 // =================== Configuration =======================
-func ListConfiguration(limit, page uint) []*DynamicConfiguration {
+func ListConfiguration(limit, page uint) ([]*DynamicConfiguration, error) {
 	result := make([]*DynamicConfiguration, 0)
-	_ = db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
-	return result
+	tx := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
+	return result, tx.Error
 }
 
 func SetConfigurationValue(name, value string) error {
@@ -59,10 +62,10 @@ func AddConfiguration(name, value string) error {
 }
 
 // =================== Event =======================
-func ListEvent(limit, page uint) []*Event {
+func ListEvent(limit, page uint) ([]*Event, error) {
 	result := make([]*Event, 0)
-	_ = db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
-	return result
+	tx := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
+	return result, tx.Error
 }
 
 func AddEvent(desc, cover, url string, begin, end time.Time) error {
@@ -84,3 +87,108 @@ func DeleteEvent(id uint) error {
 }
 
 // ================== Good ====================
+
+func ListGoods(limit, page uint) ([]*Good, error) {
+	result := make([]*Good, 0)
+	err := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result).Error
+	return result, err
+}
+
+// =================== Devices =======================
+
+func ListDevices(limit, page uint) ([]*Device, error) {
+	result := make([]*Device, 0)
+	tx := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
+	return result, tx.Error
+}
+
+func AddDevice(name string, t DeviceType, deviceId string, seatId *uint) error {
+	if len(deviceId) != 128 {
+		return errors.New("device id is not valid")
+	}
+	device := &Device{
+		Name:     name,
+		Type:     t,
+		Status:   DeviceStatusUnregistered,
+		DeviceID: deviceId,
+	}
+	if seatId != nil {
+		device.SeatID = *seatId
+	}
+	return db.Create(device).Error
+}
+
+func UpdateDevice(dev *Device) error {
+	return db.Save(dev).Error
+}
+
+func DeleteDevice(id uint) error {
+	return db.Model(&Device{}).Where("id = ?", id).Delete(&Device{}).Error
+}
+
+func GetDevice(id uint) (*Device, error) {
+	result := &Device{}
+	err := db.Where("id = ?", id).First(result).Error
+	return result, err
+}
+
+// =================== Order =======================
+func ListOrder(limit, page uint) ([]*Order, error) {
+	result := make([]*Order, 0)
+	tx := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
+	return result, tx.Error
+}
+
+func GetOrder(id uint) (*Order, error) {
+	result := &Order{}
+	err := db.Preload("Affiliate").Where("id = ?", id).First(result).Error
+	return result, err
+}
+
+// ================== Seat ====================
+func ListSeat(limit, page uint) ([]*Seat, error) {
+	result := make([]*Seat, 0)
+	tx := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
+	return result, tx.Error
+}
+
+func AddSeat(storeId uint, label string) error {
+	return db.Create(&Seat{
+		StoreID:       storeId,
+		Label:         label,
+		CurrentStatus: SeatStatusEnumVacancy,
+	}).Error
+}
+
+func UpdateSeat(seat *Seat) error {
+	return db.Save(seat).Error
+}
+
+func DeleteSeat(id uint) error {
+	return db.Model(&Seat{}).Where("id = ?", id).Delete(&Seat{}).Error
+}
+
+// ================== Store ====================
+func ListStore(limit, page uint) ([]*Store, error) {
+	result := make([]*Store, 0)
+	tx := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
+	return result, tx.Error
+}
+
+func AddStore(location string, openingHours, openingWeekdays uint) error {
+	return db.Create(&Store{
+		Location:        location,
+		Status:          StoreStatusClosed,
+		OpeningHours:    openingHours,
+		OpeningWeekdays: openingWeekdays,
+		SeatCount:       0,
+	}).Error
+}
+
+func UpdateStore(store *Store) error {
+	return db.Save(store).Error
+}
+
+func DeleteStore(id uint) error {
+	return db.Model(&Store{}).Where("id = ?", id).Delete(&Store{}).Error
+}
