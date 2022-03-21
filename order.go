@@ -68,3 +68,17 @@ func (u *User) ListOrders() ([]Order, error) {
 	tx := db.Preload("Affiliate").Where("affiliate_id = ?", u.ID).Find(&orders)
 	return orders, tx.Error
 }
+
+func GetNetRevenu() Price {
+	var result = struct {
+		Revenu Price `gorm:"column:revenu" json:"revenu"`
+	}{}
+	tx := db.
+		Where("status = ? AND created_at > ?", OrderStatusPaid, time.Now().AddDate(0, -1, 0)).
+		Select("SUM(price) revenu").
+		Scan(&result)
+	if tx.Error != nil {
+		return 0
+	}
+	return result.Revenu
+}

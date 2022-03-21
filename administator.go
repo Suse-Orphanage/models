@@ -58,3 +58,9 @@ func GetAdmin(id uint) (*Administrator, error) {
 	}
 	return &u, nil
 }
+
+func GetAdministratorCount() uint {
+	var count int64 = 0
+	db.Model(&Administrator{}).Count(&count)
+	return uint(count)
+}

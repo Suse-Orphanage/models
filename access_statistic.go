@@ -123,3 +123,12 @@ func GetMonthlyReport() ([]ASReport, error) {
 		Find(&res)
 	return res, tx.Error
 }
+
+func GetAccessCount() uint {
+	var res int64 = 0
+	_ = db.
+		Model(&AccessStatistic{}).
+		Where("time > ?", time.Now().Add(-24*time.Hour)).
+		Count(&res)
+	return uint(res)
+}

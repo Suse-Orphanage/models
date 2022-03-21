@@ -486,3 +486,9 @@ func (u *User) GetFollowings() ([]BasicUserInfomation, error) {
 
 	return ret, nil
 }
+
+func GetUserCount() uint {
+	var count int64
+	db.Model(&User{}).Count(&count)
+	return uint(count)
+}
