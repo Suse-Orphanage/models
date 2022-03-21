@@ -78,7 +78,7 @@ func AddEvent(desc, cover, url string, begin, end time.Time) error {
 	}).Error
 }
 
-func UpadteEvent(evt *Event) error {
+func UpdateEvent(evt *Event) error {
 	return db.Save(evt).Error
 }
 
