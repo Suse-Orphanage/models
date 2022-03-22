@@ -114,9 +114,9 @@ func (s *Seat) SetStatus(status SeatStatusEnum) error {
 }
 
 type SeatStatusInTimeRange struct {
-	StartTime time.Time
-	EndTime   time.Time
-	Status    SeatStatusEnum
+	StartTime time.Time      `json:"start_time"`
+	EndTime   time.Time      `json:"end_time"`
+	Status    SeatStatusEnum `json:"status"`
 }
 
 type SeatStatusSeries []SeatStatusInTimeRange
@@ -124,4 +124,12 @@ type SeatStatusSeries []SeatStatusInTimeRange
 type SeatStatusInADay struct {
 	Seat   Seat
 	Status SeatStatusSeries
+}
+
+func (status *SeatStatusEnum) MarshalJSON() ([]byte, error) {
+	strMap := map[SeatStatusEnum]string{
+		SeatStatusEnumVacancy:  "avaliable",
+		SeatStatusEnumOccupied: "occupied",
+	}
+	return []byte(`"` + strMap[*status] + `"`), nil
 }
