@@ -204,6 +204,7 @@ func DeleteStore(id uint) error {
 func ListThread(limit, page uint) ([]uint, error) {
 	result := make([]uint, 0)
 	tx := db.
+		Model(&Thread{}).
 		Select("id").
 		Where("level = 1").
 		Limit(int(limit)).
