@@ -201,8 +201,13 @@ func DeleteStore(id uint) error {
 }
 
 // ==================== Thread ====================
-func ListThread(limit, page uint) ([]*Thread, error) {
-	result := make([]*Thread, 0)
-	tx := db.Limit(int(limit)).Offset(int(limit * (page - 1))).Find(&result)
+func ListThread(limit, page uint) ([]uint, error) {
+	result := make([]uint, 0)
+	tx := db.
+		Select("id").
+		Where("level = 1").
+		Limit(int(limit)).
+		Offset(int(limit * (page - 1))).
+		Find(&result)
 	return result, tx.Error
 }
