@@ -117,11 +117,36 @@ func ValidateSession(seatID uint, start, end *time.Time) bool {
 		t := start.Add(time.Hour + time.Minute*10)
 		end = &t
 	}
+
+	// following circumstance is not valid
+	// 1. query -> start |-----------| end
+	//            |----------|
+	//
+	// 2. query -> start |-----------| end
+	//                        |-----------|
+	//
+	// 3. query -> start |-----------| end
+	//             |-----------------------|
+	//
+	// 4. query -> start |-----------|end
+	//                      |----|
+
 	tx := db.
 		Model(&Session{}).
 		Where("seat_id = ?", seatID).
-		Where("start_time >= ?", start).
-		Where("end_time <= ?", end).
+		Where(
+			`(start_time <= ? AND end_time <= ? AND end_time >= ?)
+			 OR
+			 (start_time >= ? AND end_time >= ? AND start_time <= ?)
+			 OR
+			 (start_time <= ? AND end_time >= ?)
+			 OR
+			 (start_time >= ? AND end_time <= ?)`,
+			start, end, start,
+			start, end, end,
+			start, end,
+			start, end,
+		).
 		Count(&cnt)
 
 	if tx.Error != nil {
