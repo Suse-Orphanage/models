@@ -18,9 +18,9 @@ type Seat struct {
 	gorm.Model
 	Label         string
 	StoreID       uint
-	CurrentStatus SeatStatusEnum
+	CurrentStatus SeatStatusEnum `json:"-"`
 	Status        []SeatStatus
-	Devices       []Device
+	Devices       []Device `json:"-"`
 }
 
 // deprecated

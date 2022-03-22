@@ -16,11 +16,11 @@ import (
 
 type Session struct {
 	gorm.Model
-	User   User
-	UserID uint
+	User   User `json:"-"`
+	UserID uint `json:"user_id"`
 
-	Seat   Seat
-	SeatID uint
+	Seat   Seat `json:"-"`
+	SeatID uint `json:"seat_id"`
 
 	StartTime *time.Time `gorm:"not null"`
 	EndTime   *time.Time
