@@ -129,13 +129,13 @@ func UpdateDevice(dev *Device) error {
 	return db.Save(dev).Error
 }
 
-func DeleteDevice(id uint) error {
-	return db.Model(&Device{}).Where("id = ?", id).Delete(&Device{}).Error
+func DeleteDevice(id string) error {
+	return db.Model(&Device{}).Where("device_id = ?", id).Delete(&Device{}).Error
 }
 
-func GetDevice(id uint) (*Device, error) {
+func GetDevice(id string) (*Device, error) {
 	result := &Device{}
-	err := db.Where("id = ?", id).First(result).Error
+	err := db.Where("device_id = ?", id).First(result).Error
 	return result, err
 }
 
