@@ -120,7 +120,7 @@ func AddDevice(name string, t DeviceType, deviceId string, seatId *uint) error {
 		DeviceID: deviceId,
 	}
 	if seatId != nil {
-		device.SeatID = *seatId
+		device.SeatID = seatId
 	}
 	return db.Create(device).Error
 }

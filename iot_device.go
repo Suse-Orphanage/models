@@ -40,8 +40,8 @@ type Device struct {
 	Name         string       `gorm:"type:varchar(128)"`
 	Type         DeviceType   `gorm:"type:int;default:0"`
 	Status       DeviceStatus `gorm:"type:int;default:0"`
-	Seat         Seat
-	SeatID       uint
+	Seat         *Seat
+	SeatID       *uint
 	ConnectionID string `gorm:"type:varchar(128);uniqueIndex"`
 	CurrentToken string `gorm:"type:varchar(1024)"`
 }
