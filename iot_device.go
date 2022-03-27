@@ -14,29 +14,29 @@ import (
 	"gorm.io/gorm"
 )
 
-type DeviceType uint
+type DeviceKind uint
 
 const (
-	DeviceTypeSeat = iota
-	DeviceTypePrinter
-	DeviceTypeLamp
-	DeviceTypeSocket
-	DeviceTypeVendingMachine
-	DeviceTypeOther
+	DeviceKindSeat = iota
+	DeviceKindPrinter
+	DeviceKindLamp
+	DeviceKindSocket
+	DeviceKindVendingMachine
+	DeviceKindOther
 )
 
-func (t *DeviceType) MarshalJSON() ([]byte, error) {
+func (t *DeviceKind) MarshalJSON() ([]byte, error) {
 	tStr := ""
 	switch *t {
-	case DeviceTypeSeat:
+	case DeviceKindSeat:
 		tStr = "seat"
-	case DeviceTypePrinter:
+	case DeviceKindPrinter:
 		tStr = "printer"
-	case DeviceTypeLamp:
+	case DeviceKindLamp:
 		tStr = "lamp"
-	case DeviceTypeSocket:
+	case DeviceKindSocket:
 		tStr = "socket"
-	case DeviceTypeVendingMachine:
+	case DeviceKindVendingMachine:
 		tStr = "vending_machine"
 	default:
 		tStr = "other"
@@ -75,7 +75,7 @@ type Device struct {
 	gorm.Model
 	DeviceID     string       `gorm:"uniqueIndex;type:varchar(128)"`
 	Name         string       `gorm:"type:varchar(128)"`
-	Type         DeviceType   `gorm:"type:int;default:0"`
+	Type         DeviceKind   `gorm:"type:int;default:0"`
 	Status       DeviceStatus `gorm:"type:int;default:0"`
 	Seat         *Seat
 	SeatID       *uint
