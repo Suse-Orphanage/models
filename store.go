@@ -21,6 +21,9 @@ type Store struct {
 	OpeningHours    uint
 	OpeningWeekdays uint
 
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+
 	SeatCount uint
 	SeatMap   []byte
 

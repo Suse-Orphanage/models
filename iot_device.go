@@ -22,7 +22,27 @@ const (
 	DeviceTypeLamp
 	DeviceTypeSocket
 	DeviceTypeVendingMachine
+	DeviceTypeOther
 )
+
+func (t *DeviceType) MarshalJSON() ([]byte, error) {
+	tStr := ""
+	switch *t {
+	case DeviceTypeSeat:
+		tStr = "seat"
+	case DeviceTypePrinter:
+		tStr = "printer"
+	case DeviceTypeLamp:
+		tStr = "lamp"
+	case DeviceTypeSocket:
+		tStr = "socket"
+	case DeviceTypeVendingMachine:
+		tStr = "vending_machine"
+	default:
+		tStr = "other"
+	}
+	return []byte(`"` + tStr + `"`), nil
+}
 
 type DeviceStatus uint
 
@@ -34,6 +54,23 @@ const (
 	DeviceStatusOccupied
 )
 
+func (s *DeviceStatus) MarshalJSON() ([]byte, error) {
+	sStr := ""
+	switch *s {
+	case DeviceStatusUnregistered:
+		sStr = "unregistered"
+	case DeviceStatusOffline:
+		sStr = "offline"
+	case DeviceStatusOnline:
+		sStr = "online"
+	case DeviceStatusMaintenance:
+		sStr = "maintenance"
+	case DeviceStatusOccupied:
+		sStr = "occupied"
+	}
+	return []byte(`"` + sStr + `"`), nil
+}
+
 type Device struct {
 	gorm.Model
 	DeviceID     string       `gorm:"uniqueIndex;type:varchar(128)"`
@@ -44,6 +81,8 @@ type Device struct {
 	SeatID       *uint
 	ConnectionID string `gorm:"type:varchar(128);uniqueIndex"`
 	CurrentToken string `gorm:"type:varchar(1024)"`
+
+	LastActiveAt *time.Time `gorm:"type:timestamp"`
 }
 
 type DeviceToken struct {
