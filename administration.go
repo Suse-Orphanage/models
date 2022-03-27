@@ -109,13 +109,13 @@ func ListDevices(limit, page uint) ([]*Device, error) {
 	return result, tx.Error
 }
 
-func AddDevice(name string, t DeviceType, deviceId string, seatId *uint) error {
+func AddDevice(name string, t DeviceKind, deviceId string, seatId *uint) error {
 	if len(deviceId) != 128 {
 		return errors.New("device id is not valid")
 	}
 	device := &Device{
 		Name:     name,
-		Type:     t,
+		Kind:     t,
 		Status:   DeviceStatusUnregistered,
 		DeviceID: deviceId,
 	}
