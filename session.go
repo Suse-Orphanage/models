@@ -14,6 +14,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type SessionStatus string
+
+const (
+	SessionStatusValid   SessionStatus = "valid"
+	SessionStatusOnGoing SessionStatus = "on_going"
+	SessionStatusExpired SessionStatus = "expired"
+)
+
 type Session struct {
 	gorm.Model
 	User   User `json:"-"`
@@ -28,7 +36,8 @@ type Session struct {
 	ActualEndTime *time.Time
 	BillingFee    Price
 
-	Validate *bool `gorm:"default:true"`
+	Status SessionStatus `gorm:"default:'valid'"`
+	// Validate *bool `gorm:"default:true"`
 
 	Token string `gorm:"uniqueIndex,type:varchar(1024)"`
 }
@@ -109,11 +118,16 @@ func (s *Session) SetEndTime(t *time.Time) error {
 	return tx.Error
 }
 
-func (s *Session) SetValidate(v bool) error {
-	s.Validate = &v
-	tx := db.Save(s)
-	return tx.Error
+func (s *Session) SetStatus(status SessionStatus) error {
+	s.Status = status
+	return db.Save(s).Error
 }
+
+// func (s *Session) SetValidate(v bool) error {
+// 	s.Validate = &v
+// 	tx := db.Save(s)
+// 	return tx.Error
+// }
 
 func ValidateSession(seatID uint, start, end *time.Time) bool {
 	var cnt int64 = 0
