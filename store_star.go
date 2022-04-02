@@ -33,7 +33,11 @@ func UnstarStore(s Store, u *User) bool {
 
 func GetStaredStores(u *User, page int) []Store {
 	var list []StoreStar
-	db.Where("user_id = ?", u.ID).Limit(10).Offset((page - 1) * 10).Find(&list)
+	tx := db.Preload("Store").Where("user_id = ?", u.ID).Limit(10).Offset((page - 1) * 10).Find(&list)
+	if tx.Error != nil {
+		logrus.WithError(tx.Error).Error("error when querying for user stared store")
+		return make([]Store, 0)
+	}
 
 	var stores []Store
 	for _, ss := range list {
