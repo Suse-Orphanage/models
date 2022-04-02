@@ -3,9 +3,9 @@ package models
 import "github.com/sirupsen/logrus"
 
 type StoreStar struct {
-	StoreID uint
+	StoreID uint `gorm:"primaryKey"`
 	Store   Store
-	UserID  uint
+	UserID  uint `gorm:"primaryKey"`
 	User    User
 }
 
