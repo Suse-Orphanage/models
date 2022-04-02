@@ -92,12 +92,12 @@ type Comment struct {
 }
 
 type Post struct {
-	ID      uint            `json:"id"`
-	Title   string          `json:"title"`
-	Content json.RawMessage `json:"content"`
-	Likes   uint            `json:"likes"`
-	Stars   uint            `json:"stars"`
-	Author  User            `json:"author"`
+	ID      uint                   `json:"id"`
+	Title   string                 `json:"title"`
+	Content json.RawMessage        `json:"content"`
+	Likes   uint                   `json:"likes"`
+	Stars   uint                   `json:"stars"`
+	Author  map[string]interface{} `json:"author"`
 
 	StaredByMe bool `json:"stared_by_me"`
 	LikedByMe  bool `json:"liked_by_me"`
@@ -137,7 +137,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 		Content:    Jsonb2RawMessage(t.Content),
 		Likes:      FindThreadLikeCount(threadId),
 		Stars:      FindThreadStarCount(threadId),
-		Author:     *t.Author,
+		Author:     t.Author.GetPublicInfomation(),
 		StaredByMe: threadStaredByUser(threadId, uid),
 		LikedByMe:  threadLikedByUser(threadId, uid),
 	}
