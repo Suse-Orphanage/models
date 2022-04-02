@@ -326,3 +326,31 @@ func GetRandomThreads(count int, uid uint) ([]*Post, error) {
 	}
 	return posts, tx.Error
 }
+
+func GetUserReplies(uid uint, count int) ([]uint, error) {
+	if count <= 0 {
+		return nil, errors.New("count must be greater than 0")
+	}
+	threads := make([]Thread, 0)
+	tx := db.Preload("Author").Where("deleted = false AND level > 1 AND author_id = ?", uid).Order("id desc").Limit(count).Find(&threads)
+
+	posts := make([]uint, len(threads))
+	for i, thread := range threads {
+		posts[i] = thread.ID
+	}
+	return posts, tx.Error
+}
+
+func GetUserPosts(uid uint, page int) ([]*Post, error) {
+	if page <= 0 {
+		return nil, errors.New("page must be greater than 0")
+	}
+	threads := make([]Thread, 0)
+	tx := db.Preload("Author").Where("deleted = false AND author_id = ? AND level = 1", uid).Order("id desc").Offset((page - 1) * 10).Limit(10).Find(&threads)
+
+	posts := make([]*Post, len(threads))
+	for i, thread := range threads {
+		posts[i] = ConstructPostObject(thread, uid)
+	}
+	return posts, tx.Error
+}
