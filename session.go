@@ -25,6 +25,9 @@ type Session struct {
 	StartTime *time.Time `gorm:"not null"`
 	EndTime   *time.Time
 
+	ActualEndTime *time.Time
+	BillingFee    Price
+
 	Validate *bool `gorm:"default:true"`
 
 	Token string `gorm:"uniqueIndex,type:varchar(1024)"`
@@ -176,4 +179,14 @@ func GetUserSessionHistory(u *User, page int) []*Session {
 		logrus.WithError(tx.Error).Error("Failed to get user session history")
 	}
 	return sessions
+}
+
+func (s *Session) SetBillingFee(fee Price) error {
+	s.BillingFee = fee
+	return db.Save(s).Error
+}
+
+func (s *Session) SetActualEndTime(time *time.Time) error {
+	s.ActualEndTime = time
+	return db.Save(s).Error
 }
