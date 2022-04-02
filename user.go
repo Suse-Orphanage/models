@@ -63,28 +63,28 @@ func (us *UserBillingStatus) MarshalJSON() ([]byte, error) {
 
 type User struct {
 	gorm.Model
-	Type        UserType   `gorm:"type:int;notNull"`
-	Username    string     `gorm:"type:varchar(32)"`
-	Password    string     `gorm:"type:varchar(64)"`
-	Salt        string     `gorm:"type:varchar(10)"`
-	Bio         string     `gorm:"type:varchar(255)"`
-	Phone       string     `gorm:"type:varchar(11);uniqueIndex"`
-	Openid      string     `gorm:"type:varchar(32);index"`
-	Unionid     string     `gorm:"type:varchar(64);index"`
-	WxSession   string     `gorm:"type:varchar(64)"`
-	IsPro       bool       `gorm:"notNull;default:false"`
-	ProDeadline *time.Time `gorm:"default:NULL"`
-	Avatar      string     `gorm:"default:''"`
+	Type        UserType   `gorm:"type:int;notNull" json:"-"`
+	Username    string     `gorm:"type:varchar(32)" json:"username"`
+	Password    string     `gorm:"type:varchar(64)" json:"-"`
+	Salt        string     `gorm:"type:varchar(10)" json:"-"`
+	Bio         string     `gorm:"type:varchar(255)" json:"bio"`
+	Phone       string     `gorm:"type:varchar(11);uniqueIndex" json:"-"`
+	Openid      string     `gorm:"type:varchar(32);index" json:"-"`
+	Unionid     string     `gorm:"type:varchar(64);index" json:"-"`
+	WxSession   string     `gorm:"type:varchar(64)" json:"-"`
+	IsPro       bool       `gorm:"notNull;default:false" json:"is_pro"`
+	ProDeadline *time.Time `gorm:"default:NULL" json:"-"`
+	Avatar      string     `gorm:"default:''" json:"avatar"`
 
-	CurrentOccupiedSeat   *Seat
-	CurrentOccupiedSeatID *uint
+	CurrentOccupiedSeat   *Seat `json:"-"`
+	CurrentOccupiedSeatID *uint `json:"-"`
 
-	Status              UserStatus        `gorm:"default:0"`
-	BillingStatus       UserBillingStatus `gorm:"default:0"`
-	RecentBillStartTime *time.Time        `gorm:"default:NULL"`
-	Session             string            `gorm:"type:text;default:''"`
+	Status              UserStatus        `gorm:"default:0" json:"-"`
+	BillingStatus       UserBillingStatus `gorm:"default:0" json:"-"`
+	RecentBillStartTime *time.Time        `gorm:"default:NULL" json:"-"`
+	Session             string            `gorm:"type:text;default:''" json:"-"`
 
-	RemainingCredit Price `gorm:"default:0"`
+	RemainingCredit Price `gorm:"default:0" json:"-"`
 
 	// 被这些人关注
 	Followers []*User `gorm:"many2many:user_relations;foreignKey:ID;joinForeignKey:following_id;References:ID;joinReferences:user_id"`

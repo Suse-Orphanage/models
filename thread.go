@@ -74,19 +74,19 @@ func SearchThread(keyword string, uid, page uint) []*Post {
 }
 
 type Reply struct {
-	ID      uint            `json:"id"`
-	Content json.RawMessage `json:"content"`
-	ReplyTo uint            `json:"reply_to"`
-	Author  User            `json:"author"`
+	ID      uint                   `json:"id"`
+	Content json.RawMessage        `json:"content"`
+	ReplyTo uint                   `json:"reply_to"`
+	Author  map[string]interface{} `json:"author"`
 }
 
 type Comment struct {
-	ID        uint            `json:"id"`
-	Content   json.RawMessage `json:"content"`
-	Replies   []Reply         `json:"reply_to"`
-	Author    User            `json:"author"`
-	Likes     uint            `json:"likes"`
-	LikedByMe bool            `json:"liked_by_me"`
+	ID        uint                   `json:"id"`
+	Content   json.RawMessage        `json:"content"`
+	Replies   []Reply                `json:"reply_to"`
+	Author    map[string]interface{} `json:"author"`
+	Likes     uint                   `json:"likes"`
+	LikedByMe bool                   `json:"liked_by_me"`
 
 	commentThreadId uint
 }
@@ -157,7 +157,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 		comments[i] = Comment{
 			ID:              commentThread.ID,
 			Content:         Jsonb2RawMessage(commentThread.Content),
-			Author:          *commentThread.Author,
+			Author:          commentThread.Author.GetPublicInfomation(),
 			Likes:           FindThreadLikeCount(commentThread.ID),
 			LikedByMe:       threadLikedByUser(commentThread.ID, uid),
 			commentThreadId: commentThread.ID,
@@ -179,7 +179,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 				ID:      reply.ID,
 				Content: Jsonb2RawMessage(reply.Content),
 				ReplyTo: *reply.ReplyToID,
-				Author:  *reply.Author,
+				Author:  reply.Author.GetPublicInfomation(),
 			}
 		}
 	}
