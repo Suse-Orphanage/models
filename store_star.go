@@ -11,8 +11,8 @@ type StoreStar struct {
 
 func StarStore(s Store, u *User) *StoreStar {
 	ss := &StoreStar{
-		Store: s,
-		User:  *u,
+		StoreID: s.ID,
+		UserID:  u.ID,
 	}
 	tx := db.FirstOrCreate(ss)
 	if tx.Error != nil {
