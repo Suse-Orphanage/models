@@ -20,6 +20,7 @@ const (
 	SessionStatusValid   SessionStatus = "valid"
 	SessionStatusOnGoing SessionStatus = "on_going"
 	SessionStatusExpired SessionStatus = "expired"
+	SessionStatusDone    SessionStatus = "done"
 )
 
 type Session struct {
