@@ -61,6 +61,7 @@ func CreateSession(key []byte, u *User, s *Seat, startTime, endTime *time.Time) 
 	ciphertext := make([]byte, aes.BlockSize+len(hash))
 	iv := ciphertext[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		logrus.WithError(err).Error("failed to generate cipher when creating session")
 		return ""
 	}
 
