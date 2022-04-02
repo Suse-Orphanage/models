@@ -55,7 +55,7 @@ func (s *Store) GetStoreSeatStatus(day time.Time) ([]StoreSeatsStautusSummaryWit
 	seats := getSeatsOfStore(s.ID)
 
 	truncatedDay := time.Date(day.Year(), day.Month(), day.Day(), 0, 0, 0, 0, day.Location())
-	status := make([]SeatStatusInADay, len(seats))
+	status := make([]SeatStatusInADay, 0)
 	for _, seat := range seats {
 		series := GetSeatStatusBySeatID(seat.ID, truncatedDay)
 		status = append(status, SeatStatusInADay{
