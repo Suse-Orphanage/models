@@ -28,6 +28,10 @@ type Store struct {
 	SeatMap   []byte
 
 	Seats []Seat
+
+	Cover    string
+	Name     string
+	Facility string
 }
 
 // depreacated
