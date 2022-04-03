@@ -85,7 +85,7 @@ type Reply struct {
 type Comment struct {
 	ID        uint                 `json:"id"`
 	Content   json.RawMessage      `json:"content"`
-	Replies   []Reply              `json:"reply_to"`
+	Replies   []Reply              `json:"replies"`
 	Author    UserPublicInfomation `json:"author"`
 	Likes     uint                 `json:"likes"`
 	LikedByMe bool                 `json:"liked_by_me"`
