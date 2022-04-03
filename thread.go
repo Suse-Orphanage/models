@@ -5,6 +5,7 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"
@@ -78,6 +79,7 @@ type Reply struct {
 	Content json.RawMessage        `json:"content"`
 	ReplyTo uint                   `json:"reply_to"`
 	Author  map[string]interface{} `json:"author"`
+	Time    time.Time              `json:"time"`
 }
 
 type Comment struct {
@@ -87,6 +89,7 @@ type Comment struct {
 	Author    map[string]interface{} `json:"author"`
 	Likes     uint                   `json:"likes"`
 	LikedByMe bool                   `json:"liked_by_me"`
+	Time      time.Time              `json:"time"`
 
 	commentThreadId uint
 }
@@ -98,6 +101,7 @@ type Post struct {
 	Likes   uint                   `json:"likes"`
 	Stars   uint                   `json:"stars"`
 	Author  map[string]interface{} `json:"author"`
+	Time    time.Time              `json:"time"`
 
 	StaredByMe bool `json:"stared_by_me"`
 	LikedByMe  bool `json:"liked_by_me"`
@@ -140,6 +144,9 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 		Author:     t.Author.GetPublicInfomation(),
 		StaredByMe: threadStaredByUser(threadId, uid),
 		LikedByMe:  threadLikedByUser(threadId, uid),
+
+		Time:    t.CreatedAt,
+		Deleted: t.Deleted,
 	}
 
 	// find comments
@@ -160,6 +167,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 			Author:          commentThread.Author.GetPublicInfomation(),
 			Likes:           FindThreadLikeCount(commentThread.ID),
 			LikedByMe:       threadLikedByUser(commentThread.ID, uid),
+			Time:            commentThread.CreatedAt,
 			commentThreadId: commentThread.ID,
 		}
 	}
@@ -180,6 +188,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 				Content: Jsonb2RawMessage(reply.Content),
 				ReplyTo: *reply.ReplyToID,
 				Author:  reply.Author.GetPublicInfomation(),
+				Time:    reply.CreatedAt,
 			}
 		}
 	}
