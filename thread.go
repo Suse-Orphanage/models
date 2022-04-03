@@ -75,33 +75,33 @@ func SearchThread(keyword string, uid, page uint) []*Post {
 }
 
 type Reply struct {
-	ID      uint                   `json:"id"`
-	Content json.RawMessage        `json:"content"`
-	ReplyTo uint                   `json:"reply_to"`
-	Author  map[string]interface{} `json:"author"`
-	Time    time.Time              `json:"time"`
+	ID      uint                 `json:"id"`
+	Content json.RawMessage      `json:"content"`
+	ReplyTo uint                 `json:"reply_to"`
+	Author  UserPublicInfomation `json:"author"`
+	Time    time.Time            `json:"time"`
 }
 
 type Comment struct {
-	ID        uint                   `json:"id"`
-	Content   json.RawMessage        `json:"content"`
-	Replies   []Reply                `json:"reply_to"`
-	Author    map[string]interface{} `json:"author"`
-	Likes     uint                   `json:"likes"`
-	LikedByMe bool                   `json:"liked_by_me"`
-	Time      time.Time              `json:"time"`
+	ID        uint                 `json:"id"`
+	Content   json.RawMessage      `json:"content"`
+	Replies   []Reply              `json:"reply_to"`
+	Author    UserPublicInfomation `json:"author"`
+	Likes     uint                 `json:"likes"`
+	LikedByMe bool                 `json:"liked_by_me"`
+	Time      time.Time            `json:"time"`
 
 	commentThreadId uint
 }
 
 type Post struct {
-	ID      uint                   `json:"id"`
-	Title   string                 `json:"title"`
-	Content json.RawMessage        `json:"content"`
-	Likes   uint                   `json:"likes"`
-	Stars   uint                   `json:"stars"`
-	Author  map[string]interface{} `json:"author"`
-	Time    time.Time              `json:"time"`
+	ID      uint                 `json:"id"`
+	Title   string               `json:"title"`
+	Content json.RawMessage      `json:"content"`
+	Likes   uint                 `json:"likes"`
+	Stars   uint                 `json:"stars"`
+	Author  UserPublicInfomation `json:"author"`
+	Time    time.Time            `json:"time"`
 
 	StaredByMe bool `json:"stared_by_me"`
 	LikedByMe  bool `json:"liked_by_me"`

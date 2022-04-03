@@ -317,16 +317,27 @@ func (u *User) GetDetailedInfomation(whoInquery *User) map[string]interface{} {
 	}
 }
 
-func (u *User) GetPublicInfomation() map[string]interface{} {
-	return map[string]interface{}{
-		"userid":           u.ID,
-		"avatar":           u.Avatar,
-		"username":         u.Username,
-		"bio":              u.Bio,
-		"is_pro":           u.IsPro,
-		"followers_count":  u.GetFollowersCount(),
-		"followings_count": u.GetFollowingsCount(),
-		"status":           u.Status,
+type UserPublicInfomation struct {
+	ID              uint       `json:"userid"`
+	Username        string     `json:"username"`
+	Avatar          string     `json:"avatar"`
+	Bio             string     `json:"bio"`
+	IsPro           bool       `json:"is_pro"`
+	FollowersCount  int64      `json:"followers_count"`
+	FollowingsCount int64      `json:"followings_count"`
+	Status          UserStatus `json:"status"`
+}
+
+func (u *User) GetPublicInfomation() UserPublicInfomation {
+	return UserPublicInfomation{
+		ID:              u.ID,
+		Username:        u.Username,
+		Avatar:          u.Avatar,
+		Bio:             u.Bio,
+		IsPro:           u.IsPro,
+		FollowersCount:  u.GetFollowersCount(),
+		FollowingsCount: u.GetFollowingsCount(),
+		Status:          u.Status,
 	}
 }
 
