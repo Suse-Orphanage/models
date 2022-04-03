@@ -173,7 +173,7 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 	}
 
 	// find replies for each comment
-	for _, comment := range comments {
+	for i, comment := range comments {
 		replyThreads := make([]Thread, 0)
 		tx := db.Preload("Author").Where("parent_id = ? AND deleted = false", comment.commentThreadId).Find(&replyThreads)
 		if tx.Error != nil {
@@ -181,9 +181,9 @@ func ConstructPostObject(t Thread, uid uint) *Post {
 			return nil
 		}
 
-		comment.Replies = make([]Reply, len(replyThreads))
-		for i, reply := range replyThreads {
-			comment.Replies[i] = Reply{
+		comments[i].Replies = make([]Reply, len(replyThreads))
+		for j, reply := range replyThreads {
+			comments[i].Replies[j] = Reply{
 				ID:      reply.ID,
 				Content: Jsonb2RawMessage(reply.Content),
 				ReplyTo: *reply.ReplyToID,
