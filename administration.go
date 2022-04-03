@@ -182,13 +182,16 @@ func ListStore(limit, page uint) ([]*Store, error) {
 	return result, tx.Error
 }
 
-func AddStore(location string, openingHours, openingWeekdays uint) error {
+func AddStore(location string, openingHours, openingWeekdays uint, name, conver, facility string) error {
 	return db.Create(&Store{
 		Location:        location,
 		Status:          StoreStatusClosed,
 		OpeningHours:    openingHours,
 		OpeningWeekdays: openingWeekdays,
 		SeatCount:       0,
+		Name:            name,
+		Cover:           conver,
+		Facility:        facility,
 	}).Error
 }
 
