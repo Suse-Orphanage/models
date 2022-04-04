@@ -91,7 +91,7 @@ func (o *Order) MarkPaid() error {
 
 func (u *User) ListOrders() ([]Order, error) {
 	orders := []Order{}
-	tx := db.Preload("Good").Where("affiliate_id = ?", u.ID).Find(&orders)
+	tx := db.Preload("Good").Where("affiliate_id = ?", u.ID).Order("id desc").Find(&orders)
 	return orders, tx.Error
 }
 
