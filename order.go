@@ -20,12 +20,38 @@ const (
 	OrderTypeBuyProduct
 )
 
+func (t *OrderType) MarshalJSON() ([]byte, error) {
+	str := ""
+	switch *t {
+	case OrderTypeSubscription:
+		str = "subscription"
+	case OrderTypeSubscriptionAutoRenew:
+		str = "subscription_auto_renew"
+	case OrderTypeBuyCredits:
+		str = "buy_credits"
+	case OrderTypeBuyProduct:
+		str = "buy_product"
+	}
+	return []byte(`"` + str + `"`), nil
+}
+
 type OrderStatus uint
 
 const (
 	OrderStatusPending = iota
 	OrderStatusPaid
 )
+
+func (status *OrderStatus) MarshalJSON() ([]byte, error) {
+	str := ""
+	switch *status {
+	case OrderStatusPending:
+		str = "pending"
+	case OrderStatusPaid:
+		str = "paid"
+	}
+	return []byte(`"` + str + `"`), nil
+}
 
 type Order struct {
 	gorm.Model
@@ -65,7 +91,7 @@ func (o *Order) MarkPaid() error {
 
 func (u *User) ListOrders() ([]Order, error) {
 	orders := []Order{}
-	tx := db.Preload("Affiliate").Where("affiliate_id = ?", u.ID).Find(&orders)
+	tx := db.Preload("Good").Where("affiliate_id = ?", u.ID).Find(&orders)
 	return orders, tx.Error
 }
 
