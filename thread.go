@@ -21,20 +21,24 @@ const (
 
 // 一个 Thread 可以是
 // 1. 一个帖子。此时 ParentID 和 ReplyID 都为 NULL, Level 为 1.
-// 2. 一个楼层。此时 ParentID 为 一楼的 ID，ReplyToID 为 NULL，Level 为 2.
+// 2. 一个楼层。此时 ParentID 为 帖子ID，ReplyToID 为 NULL，Level 为 2.
 // 3. 一个楼层下的回复。此时 ParentID 为 楼层的 ID，ReplyToID 为回复对象的 ID 或楼层 ID，Level 为 3.
 type Thread struct {
 	gorm.Model
 	Content   postgres.Jsonb `gorm:"type:jsonb;not null" sql:"DEFAULT '{}'::JSONB"`
 	LikeCount uint           `gorm:"default:0"`
 	Title     string         `gorm:"type:varchar(20);not null"`
-	ParentID  *uint          `gorm:"default:null"`
-	Parent    *Thread
-	ReplyToID *uint `gorm:"deafault:null"`
-	ReplyTo   *Thread
-	AuthorID  uint `gorm:"not null"`
-	Author    *User
-	Level     int `gorm:"type:int;default:1"`
+
+	ParentID        *uint `gorm:"default:null"`
+	Parent          *Thread
+	ReplyToID       *uint `gorm:"deafault:null"`
+	ReplyTo         *Thread
+	AffiliatePostID *uint `gorm:"default:null"`
+	AffiliatePost   *Thread
+
+	AuthorID uint `gorm:"not null"`
+	Author   *User
+	Level    int `gorm:"type:int;default:1"`
 
 	Deleted bool `gorm:"default:false"`
 }
@@ -198,10 +202,11 @@ var CommentOnThread = ReplyToThread
 
 func ReplyToThread(thread uint, author uint, content string) error {
 	commentThread := Thread{
-		Content:  String2Jsonb(content),
-		ParentID: &thread,
-		AuthorID: author,
-		Level:    ThreadLevelComment,
+		Content:         String2Jsonb(content),
+		ParentID:        &thread,
+		AffiliatePostID: &thread,
+		AuthorID:        author,
+		Level:           ThreadLevelComment,
 	}
 
 	tx := db.Create(&commentThread)
@@ -209,12 +214,18 @@ func ReplyToThread(thread uint, author uint, content string) error {
 }
 
 func ReplyToComment(comment, author uint, content string) error {
+	postId := uint(0)
+	err := db.Model(&Thread{}).Select("parent_id").Where("id = ?", comment).Scan(&postId).Error
+	if err != nil {
+		return err
+	}
 	replyThread := Thread{
-		Content:   String2Jsonb(content),
-		ParentID:  &comment,
-		AuthorID:  author,
-		Level:     ThreadLevelReply,
-		ReplyToID: &comment,
+		Content:         String2Jsonb(content),
+		ParentID:        &comment,
+		AffiliatePostID: &postId,
+		AuthorID:        author,
+		Level:           ThreadLevelReply,
+		ReplyToID:       &comment,
 	}
 
 	tx := db.Create(&replyThread)
@@ -222,12 +233,18 @@ func ReplyToComment(comment, author uint, content string) error {
 }
 
 func ReplyToReply(comment, author, replyTo uint, content string) error {
+	postId := uint(0)
+	err := db.Model(&Thread{}).Select("affiliate_post_id").Where("id = ?", replyTo).Scan(&postId).Error
+	if err != nil {
+		return err
+	}
 	replyThread := Thread{
-		Content:   String2Jsonb(content),
-		ParentID:  &comment,
-		ReplyToID: &replyTo,
-		AuthorID:  author,
-		Level:     ThreadLevelReply,
+		Content:         String2Jsonb(content),
+		ParentID:        &comment,
+		ReplyToID:       &replyTo,
+		AffiliatePostID: &postId,
+		AuthorID:        author,
+		Level:           ThreadLevelReply,
 	}
 
 	tx := db.Create(&replyThread)
