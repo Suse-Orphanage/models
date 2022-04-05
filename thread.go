@@ -327,7 +327,7 @@ func GetUserReplies(uid uint, page int) ([]Thread, error) {
 		return nil, errors.New("count must be greater than 0")
 	}
 	threads := make([]Thread, 0)
-	tx := db.Preload("Author").Where("deleted = false AND level > 1 AND author_id = ?", uid).Order("id desc").Offset((page - 1) * 10).Limit(10).Find(&threads)
+	tx := db.Preload("Author").Preload("AffiliatePost").Where("deleted = false AND level > 1 AND author_id = ?", uid).Order("id desc").Offset((page - 1) * 10).Limit(10).Find(&threads)
 
 	return threads, tx.Error
 }
