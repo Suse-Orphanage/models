@@ -2,6 +2,8 @@ package models
 
 import (
 	"database/sql"
+
+	"gorm.io/gorm"
 )
 
 type ThreadLike struct {
@@ -13,22 +15,50 @@ type ThreadLike struct {
 }
 
 func CreateThreadLike(tid uint, uid uint) error {
+	if threadLikedByUser(tid, uid) {
+		return NewRequestError("已经点过赞了")
+	}
+
 	tl := ThreadLike{
 		ThreadID: tid,
 		UserID:   uid,
 	}
-	return db.Save(tl).Error
+	err := db.Save(tl).Error
+	if err != nil {
+		return err
+	}
+
+	err = db.Model(&Thread{}).Update("like_count", gorm.Expr("like_count + ?", 1)).Where("id = ?", tid).Error
+	return err
 }
 
 func DeleteThreadLike(t *ThreadLike) error {
-	return db.Delete(t).Error
+	if !threadLikedByUser(t.ThreadID, t.UserID) {
+		return NewRequestError("没有点过赞")
+	}
+
+	err := db.Delete(t).Error
+	if err != nil {
+		return err
+	}
+	err = db.Model(&Thread{}).Update("like_count", gorm.Expr("like_count - ?", 1)).Where("id = ?", t.ThreadID).Error
+	return err
 }
 
 func DeleteThreadLikeOfThreadForUser(threadID uint, uid uint) error {
-	return db.
+	if !threadLikedByUser(threadID, uid) {
+		return NewRequestError("没有点过赞")
+	}
+	err := db.
 		Where("thread_id = ? AND user_id = ?", threadID, uid).
 		Delete(ThreadLike{}).
 		Error
+	if err != nil {
+		return err
+	}
+
+	err = db.Model(&Thread{}).Update("like_count", gorm.Expr("like_count - ?", 1)).Where("id = ?", threadID).Error
+	return err
 }
 
 func FindThreadLikeForUser(uid uint) ([]ThreadLike, error) {

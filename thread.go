@@ -111,24 +111,6 @@ type Post struct {
 	Deleted bool `json:"deleted"`
 }
 
-// func postLikedByUser(t *Thread, uid uint) bool {
-// 	for _, u := range t.LikedUser {
-// 		if u.ID == uid {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
-
-// func postStaredByUser(t *Thread, uid uint) bool {
-// 	for _, u := range t.StaredUser {
-// 		if u.ID == uid {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
-
 func ConstructPostObject(t Thread, uid uint) *Post {
 	threadId := t.ID
 	if t.Level != 1 {
@@ -259,12 +241,6 @@ func LikeThread(threadId uint, userId uint) error {
 		return NewRequestError("帖子不存在")
 	}
 
-	// user := User{}
-	// _ = db.First(&user, userId)
-	// thread.LikedUser = append(thread.LikedUser, &user)
-	// thread.Likes += 1
-	// tx = db.Save(thread)
-
 	return CreateThreadLike(threadId, userId)
 }
 
@@ -288,14 +264,6 @@ func StarThread(threadId uint, userId uint) error {
 	if thread.Level != ThreadLevelPost {
 		return NewRequestError("不能收藏评论")
 	}
-
-	// user := User{}
-	// _ = db.First(&user, userId)
-	// thread.StaredUser = append(thread.LikedUser, &user)
-	// thread.Stars += 1
-	// tx = db.Save(thread)
-
-	// return tx.Error
 
 	return CreateThreadStar(threadId, userId)
 }

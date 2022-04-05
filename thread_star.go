@@ -1,6 +1,10 @@
 package models
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"gorm.io/gorm"
+)
 
 type ThreadStar struct {
 	CreateAt sql.NullTime
@@ -11,23 +15,51 @@ type ThreadStar struct {
 }
 
 func CreateThreadStar(threadId, userId uint) error {
+	if threadStaredByUser(threadId, userId) {
+		return NewRequestError("已经收藏过了")
+	}
+
 	tl := ThreadStar{
 		ThreadID: threadId,
 		UserID:   userId,
 	}
 
-	return db.Save(tl).Error
+	err := db.Save(tl).Error
+	if err != nil {
+		return err
+	}
+
+	err = db.Model(&Thread{}).Update("star_count", gorm.Expr("star_count + ?", 1)).Where("id = ?", threadId).Error
+	return err
 }
 
 func DeleteThreadStar(t *ThreadStar) error {
-	return db.Delete(t).Error
+	if !threadStaredByUser(t.ThreadID, t.UserID) {
+		return NewRequestError("没有收藏过")
+	}
+
+	err := db.Delete(t).Error
+	if err != nil {
+		return err
+	}
+	err = db.Model(&Thread{}).Update("star_count", gorm.Expr("star_count - ?", 1)).Where("id = ?", t.ThreadID).Error
+	return err
 }
 
 func DeleteThreadStarOfThreadForUser(threadID uint, uid uint) error {
-	return db.
+	if !threadStaredByUser(threadID, uid) {
+		return NewRequestError("没有收藏过")
+	}
+	err := db.
 		Where("thread_id = ? AND user_id = ?", threadID, uid).
 		Delete(ThreadStar{}).
 		Error
+	if err != nil {
+		return err
+	}
+
+	err = db.Model(&Thread{}).Update("star_count", gorm.Expr("star_count - ?", 1)).Where("id = ?", threadID).Error
+	return err
 }
 
 func FindThreadStarForUser(uid uint) ([]ThreadStar, error) {
