@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 
 	"gorm.io/gorm"
@@ -8,15 +9,19 @@ import (
 
 type AccessStatistic struct {
 	gorm.Model
-	Time      time.Time
-	IP        string `gorm:"type:varchar(15);index"`
-	UserAgent string `gorm:"type:text"`
-	Path      string `gorm:"type:text"`
-	Method    string `gorm:"type:text"`
-	Status    int
-	Referer   string `gorm:"type:text"`
-	UserID    *uint
-	User      *User
+	Time            time.Time
+	IP              string `gorm:"type:varchar(15);index"`
+	UserAgent       string `gorm:"type:text"`
+	Path            string `gorm:"type:text"`
+	Method          string `gorm:"type:text"`
+	Status          int
+	Referer         string `gorm:"type:text"`
+	UserID          *uint
+	User            *User
+	AdministratorID *uint
+	Administrator   *Administrator
+
+	Data json.RawMessage `gorm:"type:jsonb"`
 }
 
 func AddStatisticInBatch(stats []AccessStatistic) error {
