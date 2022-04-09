@@ -29,6 +29,7 @@ type AccessStatistic struct {
 	OSVersion      string          `gorm:"type:varchar(255)"`
 	Browser        string          `gorm:"type:varchar(255)"`
 	BrowserVersion string          `gorm:"type:varchar(255)"`
+	Device         string          `gorm:"type:varchar(127)"`
 
 	Data json.RawMessage `gorm:"type:jsonb"`
 }
