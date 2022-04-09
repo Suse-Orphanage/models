@@ -22,7 +22,7 @@ type AccessStatistic struct {
 	Administrator   *Administrator
 
 	Headers        json.RawMessage `gorm:"type:jsonb"`
-	Country        string          `gorm:"type:varchar(2)"`
+	Country        string          `gorm:"type:varchar(127)"`
 	Region         string          `gorm:"type:varchar(255)"`
 	City           string          `gorm:"type:varchar(255)"`
 	OS             string          `gorm:"type:varchar(255)"`
