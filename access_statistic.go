@@ -21,6 +21,13 @@ type AccessStatistic struct {
 	AdministratorID *uint
 	Administrator   *Administrator
 
+	Headers json.RawMessage `gorm:"type:jsonb"`
+	Country string          `gorm:"type:varchar(2)"`
+	Region  string          `gorm:"type:varchar(255)"`
+	City    string          `gorm:"type:varchar(255)"`
+	OS      string          `gorm:"type:varchar(255)"`
+	Browser string          `gorm:"type:varchar(255)"`
+
 	Data json.RawMessage `gorm:"type:jsonb"`
 }
 
