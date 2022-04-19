@@ -93,6 +93,8 @@ type User struct {
 
 	LikedThread  []*Thread `gorm:"many2many:user_liked_thread;"`
 	StaredThread []*Thread `gorm:"many2many:user_stared_thread;"`
+
+	LatestNotificationReadTime time.Time
 }
 
 type UserRelation struct {

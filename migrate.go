@@ -44,6 +44,7 @@ func Migrate(connStr string) error {
 		&Event{},
 		&AccessStatistic{},
 		&Administrator{},
+		&Notification{},
 	)
 
 	if err != nil {
