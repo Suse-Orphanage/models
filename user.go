@@ -476,25 +476,55 @@ type BasicUserInfomation struct {
 	IsPro    bool   `json:"is_pro"`
 }
 
-func (u *User) GetFollowers() ([]BasicUserInfomation, error) {
-	ret := make([]BasicUserInfomation, 0)
+func (u *User) GetFollowers() ([]UserPublicInfomation, error) {
+	followers := make([]uint, 0)
 	tx := db.
 		Table("user_relations").
-		Find(&ret, "following_id = ?", u.ID)
+		Select("user_id").
+		Find(&followers, "following_id = ?", u.ID)
+
 	if tx.Error != nil {
-		return []BasicUserInfomation{}, tx.Error
+		return []UserPublicInfomation{}, tx.Error
+	}
+
+	users := make([]User, 0)
+	tx = db.
+		Where("id in (?)", followers).
+		Find(&users)
+	if tx.Error != nil {
+		return []UserPublicInfomation{}, tx.Error
+	}
+
+	ret := make([]UserPublicInfomation, len(users))
+	for i, _ := range users {
+		ret[i] = users[i].GetPublicInfomation()
 	}
 
 	return ret, nil
 }
 
-func (u *User) GetFollowings() ([]BasicUserInfomation, error) {
-	ret := make([]BasicUserInfomation, 0)
+func (u *User) GetFollowings() ([]UserPublicInfomation, error) {
+	followings := make([]uint, 0)
 	tx := db.
 		Table("user_relations").
-		Find(&ret, "user_id = ?", u.ID)
+		Select("following_id").
+		Find(&followings, "user_id = ?", u.ID)
+
 	if tx.Error != nil {
-		return []BasicUserInfomation{}, tx.Error
+		return []UserPublicInfomation{}, tx.Error
+	}
+
+	users := make([]User, 0)
+	tx = db.
+		Where("id in (?)", followings).
+		Find(&users)
+	if tx.Error != nil {
+		return []UserPublicInfomation{}, tx.Error
+	}
+
+	ret := make([]UserPublicInfomation, len(users))
+	for i, _ := range users {
+		ret[i] = users[i].GetPublicInfomation()
 	}
 
 	return ret, nil

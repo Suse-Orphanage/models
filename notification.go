@@ -17,6 +17,7 @@ const (
 	NotificationTypeNewMessage          = "new_message"
 	NotificationTypeCreditsRunOut       = "credits_run_out"
 	NotificationTypeScheduledTimeArrive = "scheduled_time_arrive"
+	NotificationTypeFollowingOnline     = "following_online"
 )
 
 type Notification struct {
