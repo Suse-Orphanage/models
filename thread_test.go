@@ -18,3 +18,22 @@ func TestThread(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestGetRandomPost(t *testing.T) {
+	err := Connect(getDcs())
+	if err != nil {
+		t.Error("failed to connect to database.")
+		t.Fatal(err)
+	}
+
+	post, err := GetRandomThreads(10, 1)
+	if err != nil {
+		t.Error(err)
+	}
+
+	for _, p := range post {
+		if p == nil {
+			t.Error("get random posts returned a nil value.")
+		}
+	}
+}

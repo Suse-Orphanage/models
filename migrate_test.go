@@ -9,7 +9,7 @@ func getDcs() string {
 	dcs := ""
 	dcs = os.Getenv("DB_CONNECTION_STRING")
 	if dcs == "" {
-		dcs = "host=localhost user=sheey password=quaephietheiHah5auxop0uuPhufoquu dbname=roomy port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+		panic("failed to retrieve DB_CONNECTION_STRING from environment variables.")
 	}
 
 	return dcs

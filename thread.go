@@ -313,7 +313,13 @@ func GetRandomThreads(count int, uid uint) ([]*Post, error) {
 		return nil, errors.New("count must be greater than 0")
 	}
 	threads := make([]Thread, 0)
-	tx := db.Preload("Author").Where("deleted = false AND level = 1").Order("random()").Limit(count).Order("like_count desc, id desc").Find(&threads)
+	tx := db.
+		Preload("Author").
+		Where("deleted = false AND level = 1").
+		Order("random()").
+		Limit(count).
+		Order("like_count desc, id desc").
+		Find(&threads)
 
 	posts := make([]*Post, len(threads))
 	for i, thread := range threads {
