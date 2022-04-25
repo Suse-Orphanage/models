@@ -369,11 +369,12 @@ type PostSummary struct {
 	ID      uint            `gorm:"id"`
 	Title   string          `gorm:"title"`
 	Content json.RawMessage `gorm:"content"`
+	Author  *User           `gorm:"author"`
 }
 
 func GetPostSummary(id uint) *PostSummary {
 	thread := Thread{}
-	tx := db.First(&thread, id)
+	tx := db.Preload("author").First(&thread, id)
 	if tx.Error != nil {
 		return nil
 	}
@@ -382,6 +383,7 @@ func GetPostSummary(id uint) *PostSummary {
 		ID:      thread.ID,
 		Title:   thread.Title,
 		Content: Jsonb2RawMessage(thread.Content),
+		Author:  thread.Author,
 	}
 
 	if tx.Error != nil {

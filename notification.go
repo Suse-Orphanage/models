@@ -34,6 +34,64 @@ type Notification struct {
 	Data                           json.RawMessage `gorm:"type:jsonb"`
 }
 
+func (n *Notification) MarshalJSON() ([]byte, error) {
+	r := make(map[string]interface{}, 0)
+	r["type"] = n.Type
+	r["time"] = n.CreatedAt
+	r["data"] = n.Data
+	switch n.Type {
+	case NotificationTypeThreadReply:
+		fallthrough
+	case NotificationTypeThreadLike:
+		if n.AffiliateNotificationSubjectID == nil {
+			logrus.Errorf("Notification.MarshalJSON: notification id %d has no affiliate subject id", n.ID)
+			return json.Marshal(nil)
+		}
+		post := GetPostSummary(*n.AffiliateNotificationSubjectID)
+		if post == nil {
+			logrus.Errorf("PushThreadReplyNotification: failed to get post summary, post object is nil")
+			return json.Marshal(nil)
+		}
+		r["thread_id"] = post.ID
+		r["thread_title"] = post.Title
+		r["thread_content"] = post.Content
+		r["thread_author"] = post.Author
+	case NotificationTypeFollows:
+		var u *User
+		if n.AffiliateNotificationSubjectID != nil {
+			u, _ = FindUser(n.UserID)
+			r["follower"] = u.GetPublicInfomation()
+		} else {
+			logrus.Errorf("Notification.MarshalJSON: notification id %d has no follower id", n.ID)
+		}
+	case NotificationTypeBeMentioned:
+		// TODO: to be implemented
+		logrus.Error("PushBeMentionedNotification: not implemented")
+	case NotificationTypeChat:
+		var u *User
+		if n.AffiliateNotificationSubjectID != nil {
+			u, _ = FindUser(n.UserID)
+			r["sender"] = u.GetPublicInfomation()
+		} else {
+			logrus.Errorf("Notification.MarshalJSON: notification id %d has no sender id", n.ID)
+		}
+	case NotificationTypeCreditsRunOut:
+		break
+	case NotificationTypeScheduledTimeArrive:
+		// TODO: add related session
+		break
+	case NotificationTypeFollowingOnline:
+		var u *User
+		if n.AffiliateNotificationSubjectID != nil {
+			u, _ = FindUser(n.UserID)
+			r["following"] = u.GetPublicInfomation()
+		} else {
+			logrus.Errorf("Notification.MarshalJSON: notification id %d has no friends id", n.ID)
+		}
+	}
+	return json.Marshal(r)
+}
+
 func PushNotification(n *Notification) error {
 	err := db.Save(n).Error
 	return err
