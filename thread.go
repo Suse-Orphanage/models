@@ -210,6 +210,9 @@ func ReplyToThread(thread uint, author uint, content string) error {
 	}
 
 	tx := db.Create(&commentThread)
+	if tx.Error == nil {
+		PushThreadReplyNotification(thread, commentThread.ID)
+	}
 	return tx.Error
 }
 
@@ -229,6 +232,9 @@ func ReplyToComment(comment, author uint, content string) error {
 	}
 
 	tx := db.Create(&replyThread)
+	if tx.Error == nil {
+		PushThreadReplyNotification(comment, replyThread.ID)
+	}
 	return tx.Error
 }
 
@@ -248,6 +254,9 @@ func ReplyToReply(comment, author, replyTo uint, content string) error {
 	}
 
 	tx := db.Create(&replyThread)
+	if tx.Error == nil {
+		PushThreadReplyNotification(comment, replyThread.ID)
+	}
 	return tx.Error
 }
 
@@ -304,6 +313,10 @@ func DeleteThread(id uint) error {
 
 	thread.Deleted = true
 	tx = db.Save(thread)
+	_ = DeleteNotificationOfManyType(
+		[]NotificationType{NotificationTypeThreadLike, NotificationTypeThreadReply},
+		thread.ID,
+	)
 
 	return tx.Error
 }

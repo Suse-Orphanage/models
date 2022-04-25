@@ -359,6 +359,9 @@ func FollowUser(user, userToBeFollowed *User) error {
 		logrus.WithError(tx.Error).Errorf("error on updateing at follow user method.")
 		return errors.New("更新用户时出现错误")
 	}
+
+	PushFollowNotification(userToBeFollowed.ID, user.ID)
+
 	return nil
 }
 
@@ -378,6 +381,12 @@ func UnfollowUser(user, userToBeFollowed *User) error {
 		logrus.WithError(tx.Error).Errorf("error on updating at unfollow user method.")
 		return errors.New("更新用户时出现错误")
 	}
+
+	err := DeleteNotification(NotificationTypeFollows, userToBeFollowed.ID, user.ID)
+	if err != nil {
+		logrus.WithError(err).Errorf("error on deleting notification at unfollow user method.")
+	}
+
 	return nil
 }
 
@@ -496,7 +505,7 @@ func (u *User) GetFollowers() ([]UserPublicInfomation, error) {
 	}
 
 	ret := make([]UserPublicInfomation, len(users))
-	for i, _ := range users {
+	for i := range users {
 		ret[i] = users[i].GetPublicInfomation()
 	}
 
@@ -523,7 +532,7 @@ func (u *User) GetFollowings() ([]UserPublicInfomation, error) {
 	}
 
 	ret := make([]UserPublicInfomation, len(users))
-	for i, _ := range users {
+	for i := range users {
 		ret[i] = users[i].GetPublicInfomation()
 	}
 

@@ -27,6 +27,7 @@ func CreateThreadLike(tid uint, uid uint) error {
 	if err != nil {
 		return err
 	}
+	PushThreadLikeNotification(tid, uid)
 
 	err = db.Model(&Thread{}).Update("like_count", gorm.Expr("like_count + ?", 1)).Where("id = ?", tid).Error
 	return err
@@ -41,6 +42,7 @@ func DeleteThreadLike(t *ThreadLike) error {
 	if err != nil {
 		return err
 	}
+	_ = DeleteNotification(NotificationTypeThreadLike, t.UserID, t.ThreadID)
 	err = db.Model(&Thread{}).Update("like_count", gorm.Expr("like_count - ?", 1)).Where("id = ?", t.ThreadID).Error
 	return err
 }
@@ -56,6 +58,7 @@ func DeleteThreadLikeOfThreadForUser(threadID uint, uid uint) error {
 	if err != nil {
 		return err
 	}
+	_ = DeleteNotification(NotificationTypeThreadLike, threadID, uid)
 
 	err = db.Model(&Thread{}).Update("like_count", gorm.Expr("like_count - ?", 1)).Where("id = ?", threadID).Error
 	return err
