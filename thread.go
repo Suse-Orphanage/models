@@ -351,3 +351,28 @@ func GetUserPosts(uid uint, page int) ([]*Post, error) {
 	}
 	return posts, tx.Error
 }
+
+type PostSummary struct {
+	ID      uint            `gorm:"id"`
+	Title   string          `gorm:"title"`
+	Content json.RawMessage `gorm:"content"`
+}
+
+func GetPostSummary(id uint) {
+	thread := Thread{}
+	tx := db.First(&thread, id)
+	if tx.Error != nil {
+		return
+	}
+
+	post := PostSummary{
+		ID:      thread.ID,
+		Title:   thread.Title,
+		Content: Jsonb2RawMessage(thread.Content),
+	}
+
+	tx = db.Save(&post)
+	if tx.Error != nil {
+		return
+	}
+}

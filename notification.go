@@ -14,12 +14,11 @@ const (
 	NotificationTypeThreadLike          = "thread_like"
 	NotificationTypeFollows             = "follow"
 	NotificationTypeBeMentioned         = "be_mentioned"
-	NotificationTypeNewMessage          = "new_message"
+	NotificationTypeChat                = "chat"
 	NotificationTypeCreditsRunOut       = "credits_run_out"
 	NotificationTypeScheduledTimeArrive = "scheduled_time_arrive"
 	NotificationTypeFollowingOnline     = "following_online"
 	NotificationTypeLinkedMessage       = "linked_message"
-	NotificationTypeChat                = "chat"
 )
 
 type Notification struct {
