@@ -358,11 +358,11 @@ type PostSummary struct {
 	Content json.RawMessage `gorm:"content"`
 }
 
-func GetPostSummary(id uint) {
+func GetPostSummary(id uint) *PostSummary {
 	thread := Thread{}
 	tx := db.First(&thread, id)
 	if tx.Error != nil {
-		return
+		return nil
 	}
 
 	post := PostSummary{
@@ -371,8 +371,8 @@ func GetPostSummary(id uint) {
 		Content: Jsonb2RawMessage(thread.Content),
 	}
 
-	tx = db.Save(&post)
 	if tx.Error != nil {
-		return
+		return &post
 	}
+	return nil
 }
