@@ -48,13 +48,22 @@ func DeleteNotifications(t NotificationType, uid, aff_id uint) error {
 	).Error
 }
 
-func QueryNewNotification(t NotificationType, u User) ([]*Notification, error) {
+func QueryNotificationOfType(t NotificationType, u User) ([]*Notification, error) {
 	result := make([]*Notification, 0)
 	err := db.
-		Where("type = ? AND user_id = ? AND created_at > ?", t, u.ID, u.LatestNotificationReadTime).
+		Where("type = ? AND user_id = ?", t, u.ID).
 		Find(&result).
 		Error
 	return result, err
+}
+
+func QueryNotification(u User) ([]*Notification, error) {
+	notifications := make([]*Notification, 0)
+	err := db.
+		Where("user_id = ? AND created_at > ?", u.ID, u.LatestNotificationReadTime).
+		Find(&notifications).
+		Error
+	return notifications, err
 }
 
 func (u *User) CommitNotificationRead(t time.Time) error {
