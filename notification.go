@@ -48,19 +48,25 @@ func DeleteNotifications(t NotificationType, uid, aff_id uint) error {
 	).Error
 }
 
-func QueryNotificationOfType(t NotificationType, u User) ([]*Notification, error) {
+func QueryNotificationOfType(t NotificationType, u User, limit, page int) ([]*Notification, error) {
 	result := make([]*Notification, 0)
 	err := db.
 		Where("type = ? AND user_id = ?", t, u.ID).
+		Limit(limit).
+		Offset(limit * (page - 1)).
+		Order("created_at desc").
 		Find(&result).
 		Error
 	return result, err
 }
 
-func QueryNotification(u User) ([]*Notification, error) {
+func QueryNotification(u User, limit, page int) ([]*Notification, error) {
 	notifications := make([]*Notification, 0)
 	err := db.
 		Where("user_id = ? AND created_at > ?", u.ID, u.LatestNotificationReadTime).
+		Limit(limit).
+		Offset(limit * (page - 1)).
+		Order("created_at desc").
 		Find(&notifications).
 		Error
 	return notifications, err
