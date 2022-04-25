@@ -13,11 +13,13 @@ const (
 	NotificationTypeThreadReply         = "thread_reply"
 	NotificationTypeThreadLike          = "thread_like"
 	NotificationTypeFollows             = "follow"
-	NotificationTypeBeMention           = "be_mention"
+	NotificationTypeBeMentioned         = "be_mentioned"
 	NotificationTypeNewMessage          = "new_message"
 	NotificationTypeCreditsRunOut       = "credits_run_out"
 	NotificationTypeScheduledTimeArrive = "scheduled_time_arrive"
 	NotificationTypeFollowingOnline     = "following_online"
+	NotificationTypeLinkedMessage       = "linked_message"
+	NotificationTypeChat                = "chat"
 )
 
 type Notification struct {
@@ -32,7 +34,7 @@ type Notification struct {
 	Data                           json.RawMessage `gorm:"type:jsonb"`
 }
 
-func SaveNotification(n *Notification) error {
+func PushNotification(n *Notification) error {
 	err := db.Save(n).Error
 	return err
 }
@@ -56,7 +58,7 @@ func QueryNewNotification(t NotificationType, u User) ([]*Notification, error) {
 }
 
 func (u *User) CommitNotificationRead(t time.Time) error {
-	if t.After(time.Now()) {
+	if t.After(time.Now().Add(time.Second * 5)) {
 		return NewRequestError("时间不正确")
 	}
 	u.LatestNotificationReadTime = t
