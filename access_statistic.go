@@ -164,34 +164,34 @@ func GetLatestMonthlyReport() ([]ASReport, error) {
 	return GetMonthlyReportWithCustomMonths(3)
 }
 
-type CatagoryCount struct {
-	Catagory string `gorm:"column:catagory" json:"catagory"`
+type CategoryCount struct {
+	Category string `gorm:"column:category" json:"category"`
 	Count    uint   `gorm:"column:cnt" json:"count"`
 }
 type StasticsSummary struct {
 	TotalCount uint            `json:"total_count"`
-	Browsers   []CatagoryCount `json:"browsers"`
-	OSs        []CatagoryCount `json:"os"`
-	Devices    []CatagoryCount `json:"devices"`
-	Locations  []CatagoryCount `json:"locations"`
-	API        []CatagoryCount `json:"api"`
+	Browsers   []CategoryCount `json:"browsers"`
+	OSs        []CategoryCount `json:"os"`
+	Devices    []CategoryCount `json:"devices"`
+	Locations  []CategoryCount `json:"locations"`
+	API        []CategoryCount `json:"api"`
 
 	Reports []ASReport `json:"reports"`
 }
 
 func GetOverallStasticsSummary(days int) StasticsSummary {
-	browsers := []CatagoryCount{}
-	os := []CatagoryCount{}
-	devices := []CatagoryCount{}
-	locations := []CatagoryCount{}
-	api := []CatagoryCount{}
+	browsers := []CategoryCount{}
+	os := []CategoryCount{}
+	devices := []CategoryCount{}
+	locations := []CategoryCount{}
+	api := []CategoryCount{}
 
 	t := time.Now().Add(-24 * time.Hour * time.Duration(days))
 	t.Truncate(24 * time.Hour)
 
 	tx := db.Begin()
 	tx.Model(&AccessStatistic{}).
-		Select("browser catagory, COUNT(*) cnt").
+		Select("browser category, COUNT(*) cnt").
 		Where("time > ?", t).
 		Where("browser is not null").
 		Where("browser != ''").
@@ -199,7 +199,7 @@ func GetOverallStasticsSummary(days int) StasticsSummary {
 		Order("cnt desc").
 		Find(&browsers)
 	tx.Model(&AccessStatistic{}).
-		Select("os catagory, COUNT(*) cnt").
+		Select("os category, COUNT(*) cnt").
 		Where("time > ?", t).
 		Where("os is not null").
 		Where("os != ''").
@@ -207,7 +207,7 @@ func GetOverallStasticsSummary(days int) StasticsSummary {
 		Order("cnt desc").
 		Find(&os)
 	tx.Model(&AccessStatistic{}).
-		Select("device catagory, COUNT(*) cnt").
+		Select("device category, COUNT(*) cnt").
 		Where("time > ?", t).
 		Where("device is not null").
 		Where("device != ''").
@@ -215,7 +215,7 @@ func GetOverallStasticsSummary(days int) StasticsSummary {
 		Order("cnt desc").
 		Find(&devices)
 	tx.Model(&AccessStatistic{}).
-		Select("concat(country, ',', city) catagory, COUNT(*) cnt").
+		Select("concat(country, ',', city) category, COUNT(*) cnt").
 		Where("time > ?", t).
 		Where("country != ''").
 		Where("city != ''").
@@ -223,7 +223,7 @@ func GetOverallStasticsSummary(days int) StasticsSummary {
 		Order("cnt desc").
 		Find(&locations)
 	tx.Model(&AccessStatistic{}).
-		Select("path catagory, COUNT(*) cnt").
+		Select("path category, COUNT(*) cnt").
 		Where("time > ?", t).
 		Group("path").
 		Order("cnt desc").
