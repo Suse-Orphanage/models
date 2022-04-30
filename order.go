@@ -114,7 +114,7 @@ func (o *Order) CommitPaid() error {
 	err = tx.
 		Model(User{}).
 		Where("id = ?", o.AffiliateID).
-		Update("credits", gorm.Expr("credits + ?", o.Amount)).
+		Update("remaining_credit", gorm.Expr("remaining_credit + ?", o.Amount)).
 		Error
 	if err != nil {
 		tx.Rollback()
