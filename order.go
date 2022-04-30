@@ -38,8 +38,9 @@ func (t *OrderType) MarshalJSON() ([]byte, error) {
 type OrderStatus uint
 
 const (
-	OrderStatusPending = iota
+	OrderStatusPending OrderStatus = iota
 	OrderStatusPaid
+	OrderStatusCancelled
 )
 
 func (status *OrderStatus) MarshalJSON() ([]byte, error) {
@@ -84,9 +85,43 @@ func GetOrderByID(id string) (Order, error) {
 	return o, tx.Error
 }
 
+// mark paid only marks current order to paid status,
+// to keep atomic operation, use CommitPaid instead.
 func (o *Order) MarkPaid() error {
 	tx := db.Model(o).Update("status", OrderStatusPaid)
 	return tx.Error
+}
+
+// CommitPaid commits the order to paid status,
+// and increase user's credits in one transaction.
+func (o *Order) CommitPaid() error {
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	err := tx.
+		Model(o).
+		Update("status", OrderStatusPaid).
+		Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.
+		Model(User{}).
+		Where("id = ?", o.AffiliateID).
+		Update("credits", gorm.Expr("credits + ?", o.Amount)).
+		Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 func (u *User) ListOrders() ([]Order, error) {
