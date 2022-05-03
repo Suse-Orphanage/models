@@ -233,7 +233,7 @@ func GetUserSessionHistory(u *User, page int) []*Session {
 		Update("status", SessionStatusExpired)
 	tx := db.
 		Order("start_time desc").
-		Offset(page*10).
+		Offset((page-1)*10).
 		Limit(10).
 		Find(&sessions, "user_id = ?", u.ID)
 	if tx == nil {
