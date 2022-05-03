@@ -17,10 +17,11 @@ import (
 type SessionStatus string
 
 const (
-	SessionStatusValid   SessionStatus = "valid"
-	SessionStatusOnGoing SessionStatus = "on_going"
-	SessionStatusExpired SessionStatus = "expired"
-	SessionStatusDone    SessionStatus = "done"
+	SessionStatusValid    SessionStatus = "valid"
+	SessionStatusCanceled SessionStatus = "valid"
+	SessionStatusOnGoing  SessionStatus = "on_going"
+	SessionStatusExpired  SessionStatus = "expired"
+	SessionStatusDone     SessionStatus = "done"
 )
 
 type Session struct {
@@ -130,7 +131,7 @@ func (s *Session) SetStatus(status SessionStatus) error {
 // 	return tx.Error
 // }
 
-func ValidateSession(seatID uint, start, end *time.Time) bool {
+func ValidateSession(uid, seatID uint, start, end *time.Time) error {
 	var cnt int64 = 0
 	if end == nil {
 		t := start.Add(time.Hour + time.Minute*10)
@@ -138,17 +139,21 @@ func ValidateSession(seatID uint, start, end *time.Time) bool {
 	}
 
 	// following circumstance is not valid
-	// 1. query -> start |-----------| end
-	//            |----------|
+	// 1. application -> start |-----------| end
+	//                  |----------|
 	//
-	// 2. query -> start |-----------| end
-	//                        |-----------|
+	// 2. application -> start |-----------| end
+	//                               |-----------|
 	//
-	// 3. query -> start |-----------| end
-	//             |-----------------------|
+	// 3. application-> start |-----------| end
+	//                  |-----------------------|
 	//
-	// 4. query -> start |-----------|end
-	//                      |----|
+	// 4. application -> start |-----------|end
+	//                            |----|
+	//
+	// 5. user also cannot apply if there exists
+	// a session that has been appointed with
+	// time range which overlaps with given time range
 
 	tx := db.
 		Model(&Session{}).
@@ -169,9 +174,41 @@ func ValidateSession(seatID uint, start, end *time.Time) bool {
 		Count(&cnt)
 
 	if tx.Error != nil {
-		logrus.WithError(tx.Error).Error("Failed to validate session time")
+		logrus.WithError(tx.Error).Error("Failed to validate session time when query seat vacancy")
+		return tx.Error
 	}
-	return cnt == 0 && tx.Error == nil
+	if cnt != 0 {
+		return NewRequestError("座位已被预约")
+	}
+
+	tx = db.
+		Model(&Session{}).
+		Where("user_id = ?", uid).
+		Where("status = ?", SessionStatusValid).
+		Where(
+			`(start_time <= ? AND end_time <= ? AND end_time >= ?)
+			OR
+			(start_time >= ? AND end_time >= ? AND start_time <= ?)
+			OR
+			(start_time <= ? AND end_time >= ?)
+			OR
+			(start_time >= ? AND end_time <= ?)`,
+			start, end, start,
+			start, end, end,
+			start, end,
+			start, end,
+		).
+		Count(&cnt)
+
+	if tx.Error != nil {
+		logrus.WithError(tx.Error).Error("Failed to validate session time when querying user exising session")
+		return tx.Error
+	}
+	if cnt != 0 {
+		return NewRequestError("用户已有预约")
+	}
+
+	return nil
 }
 
 func GetSessionViaUser(u *User) *Session {
@@ -194,7 +231,11 @@ func GetUserSessionHistory(u *User, page int) []*Session {
 		Where("status = ?", SessionStatusValid).
 		Where("end_time < ?", time.Now()).
 		Update("status", SessionStatusExpired)
-	tx := db.Find(&sessions, "user_id = ?", u.ID).Order("start_time desc").Offset(page * 10).Limit(10)
+	tx := db.
+		Find(&sessions, "user_id = ?", u.ID).
+		Order("start_time desc").
+		Offset(page * 10).
+		Limit(10)
 	if tx == nil {
 		logrus.WithError(tx.Error).Error("Failed to get user session history")
 	}
