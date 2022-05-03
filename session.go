@@ -189,6 +189,11 @@ func GetSessionViaUser(u *User) *Session {
 
 func GetUserSessionHistory(u *User, page int) []*Session {
 	sessions := make([]*Session, 0)
+	_ = db.Model(&Session{}).
+		Where("user_id = ?", u.ID).
+		Where("status = ?", SessionStatusValid).
+		Where("end_time < ?", time.Now()).
+		Update("status", SessionStatusExpired)
 	tx := db.Find(&sessions, "user_id = ?", u.ID).Order("start_time desc").Offset(page * 10).Limit(10)
 	if tx == nil {
 		logrus.WithError(tx.Error).Error("Failed to get user session history")
