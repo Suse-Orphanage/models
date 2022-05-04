@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
+	"encoding/json"
 	"io"
 	"time"
 
@@ -79,10 +80,12 @@ type Device struct {
 	Status       DeviceStatus `gorm:"type:int;default:0"`
 	Seat         *Seat
 	SeatID       *uint
-	ConnectionID string `gorm:"type:varchar(128);uniqueIndex"`
-	CurrentToken string `gorm:"type:varchar(1024)"`
+	ConnectionID *string `gorm:"type:varchar(128);uniqueIndex"`
+	CurrentToken string  `gorm:"type:varchar(1024)"`
 
 	LastActiveAt *time.Time `gorm:"type:timestamp"`
+
+	ExpectedStatus *json.RawMessage `gorm:"type:jsonb"`
 }
 
 type DeviceToken struct {
@@ -172,7 +175,13 @@ func (d *Device) SetDeviceStatus(status DeviceStatus) error {
 }
 
 func (d *Device) SetConnectionID(id string) error {
-	d.ConnectionID = id
+	d.ConnectionID = &id
+	tx := db.Save(d)
+	return tx.Error
+}
+
+func (d *Device) EmptyConnectID() error {
+	d.ConnectionID = nil
 	tx := db.Save(d)
 	return tx.Error
 }
