@@ -81,7 +81,7 @@ type Device struct {
 	Seat         *Seat
 	SeatID       *uint
 	ConnectionID *string `gorm:"type:varchar(128);uniqueIndex"`
-	CurrentToken string  `gorm:"type:varchar(1024)"`
+	CurrentToken *string `gorm:"type:varchar(1024)"`
 
 	LastActiveAt *time.Time `gorm:"type:timestamp"`
 
@@ -154,8 +154,13 @@ func SaveToken(device *Device, token string, expiration time.Time, u *User, s *S
 	if tx.Error != nil {
 		return tx.Error
 	}
-	device.CurrentToken = token
+	device.CurrentToken = &token
 	return db.Save(&device).Error
+}
+
+func EmptyToken(device *Device) error {
+	tx := db.Model(device).Update("current_token", nil)
+	return tx.Error
 }
 
 func (t *DeviceToken) SetValid(valid bool) error {
